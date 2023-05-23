@@ -13,6 +13,9 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+  # OAuth2 설정
+  profiles:
+    include: oauth
 
 # 로그 레벨 설정
 logging:
@@ -20,3 +23,4 @@ logging:
     org.springframework: info
     org.springframework.security: trace
     web: debug
+
