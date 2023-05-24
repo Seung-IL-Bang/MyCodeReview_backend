@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,6 +30,15 @@ public class CustomSecurityConfig {
 
         // CSRF 토큰 비활성화
         http.csrf(AbstractHttpConfigurer::disable);
+
+        // authorizeHttpRequests 권한 설정
+        // 'ROLE_' is automatically prepended when using hasRole
+        http
+                .authorizeHttpRequests(authz -> {
+                    authz.requestMatchers(HttpMethod.GET, "/auth/**").hasRole("USER")
+                            .requestMatchers(HttpMethod.GET, "/auth2/**").hasRole("USER")
+                            .anyRequest().permitAll(); // 나머지 경로는 모두 허용 [필수]
+                });
 
         // OAuth2 Login
         http.oauth2Login(req -> req.loginPage("/login").successHandler(authenticationSuccessHandler()));
