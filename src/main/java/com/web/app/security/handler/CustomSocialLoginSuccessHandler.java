@@ -1,5 +1,6 @@
 package com.web.app.security.handler;
 
+import com.web.app.security.dto.MemberSecurityDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,5 +21,11 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("========================== Social Login Success Handler ==========================");
+
+        MemberSecurityDTO principal = (MemberSecurityDTO) authentication.getPrincipal();
+
+        log.info(principal);
+
+        response.sendRedirect("/");
     }
 }
