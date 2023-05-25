@@ -48,4 +48,8 @@ public class MemberSecurityDTO implements OAuth2User {
     public String getName() {
         return this.name;
     }
+
+    public String getRole() {
+        return memberRole.getKey();
+    }
 }
