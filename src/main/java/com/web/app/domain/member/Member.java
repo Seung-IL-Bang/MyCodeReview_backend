@@ -1,6 +1,6 @@
 package com.web.app.domain.member;
 
-import com.web.app.util.BaseTimeEntity;
+import com.web.app.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

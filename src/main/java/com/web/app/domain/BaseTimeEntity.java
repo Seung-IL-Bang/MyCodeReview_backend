@@ -1,4 +1,4 @@
-package com.web.app.util;
+package com.web.app.domain;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
