@@ -1,5 +1,6 @@
 package com.web.app.config;
 
+import com.web.app.security.filter.AccessTokenCheckFilter;
 import com.web.app.security.handler.CustomSocialLoginSuccessHandler;
 import com.web.app.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Log4j2
 @Configuration
@@ -38,14 +39,8 @@ public class CustomSecurityConfig {
         // 세션 비활성화 -> 소셜 로그인 후에도 인증 정보가 없다.
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // authorizeHttpRequests 권한 설정
-        // 'ROLE_' is automatically prepended when using hasRole
-//        http
-//                .authorizeHttpRequests(authz -> {
-//                    authz.requestMatchers(HttpMethod.GET, "/auth/**").hasRole("USER")
-//                            .requestMatchers(HttpMethod.GET, "/auth2/**").hasRole("USER")
-//                            .anyRequest().permitAll(); // 나머지 경로는 모두 허용 [필수]
-//                });
+        // authentication 전 '/auth/**' 경로에 대해 accessToken 유효성 검증
+        http.addFilterBefore(accessTokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         // OAuth2 Login
         http.oauth2Login(req -> req.loginPage("/login").successHandler(authenticationSuccessHandler()));
@@ -71,5 +66,9 @@ public class CustomSecurityConfig {
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new CustomSocialLoginSuccessHandler(passwordEncoder(), jwtUtil);
+    }
+
+    private AccessTokenCheckFilter accessTokenCheckFilter(JWTUtil jwtUtil) {
+        return new AccessTokenCheckFilter(jwtUtil);
     }
 }
