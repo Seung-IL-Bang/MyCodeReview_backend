@@ -24,3 +24,8 @@ logging:
     org.springframework.security: trace
     web: debug
 
+# jwt secret key
+com:
+  web:
+    jwt:
+      secret: ${JWT_SECRET}
