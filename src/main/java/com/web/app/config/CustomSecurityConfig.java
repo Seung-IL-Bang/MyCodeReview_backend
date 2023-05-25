@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,14 +32,17 @@ public class CustomSecurityConfig {
         // CSRF 토큰 비활성화
         http.csrf(AbstractHttpConfigurer::disable);
 
+        // 세션 비활성화 -> 소셜 로그인 후에도 인증 정보가 없다.
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
         // authorizeHttpRequests 권한 설정
         // 'ROLE_' is automatically prepended when using hasRole
-        http
-                .authorizeHttpRequests(authz -> {
-                    authz.requestMatchers(HttpMethod.GET, "/auth/**").hasRole("USER")
-                            .requestMatchers(HttpMethod.GET, "/auth2/**").hasRole("USER")
-                            .anyRequest().permitAll(); // 나머지 경로는 모두 허용 [필수]
-                });
+//        http
+//                .authorizeHttpRequests(authz -> {
+//                    authz.requestMatchers(HttpMethod.GET, "/auth/**").hasRole("USER")
+//                            .requestMatchers(HttpMethod.GET, "/auth2/**").hasRole("USER")
+//                            .anyRequest().permitAll(); // 나머지 경로는 모두 허용 [필수]
+//                });
 
         // OAuth2 Login
         http.oauth2Login(req -> req.loginPage("/login").successHandler(authenticationSuccessHandler()));
