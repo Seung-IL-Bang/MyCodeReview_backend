@@ -1,6 +1,7 @@
 package com.web.app.config;
 
 import com.web.app.security.handler.CustomSocialLoginSuccessHandler;
+import com.web.app.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @Configuration
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
+
+    private final JWTUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -67,6 +70,6 @@ public class CustomSecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomSocialLoginSuccessHandler(passwordEncoder());
+        return new CustomSocialLoginSuccessHandler(passwordEncoder(), jwtUtil);
     }
 }
