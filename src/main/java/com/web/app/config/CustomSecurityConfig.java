@@ -73,7 +73,7 @@ public class CustomSecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomSocialLoginSuccessHandler(passwordEncoder(), jwtUtil);
+        return new CustomSocialLoginSuccessHandler(jwtUtil);
     }
 
     @Bean
