@@ -47,6 +47,19 @@ dependencies {
 	// Spring Boot devtools
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+	// Gson
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	// jjwt
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359' // java.lang.NoClassDefFoundError: javax/xml/bind/DatatypeConverter 에러 방지 -> jdk 8 이후 삭제되어 수동 추가 필요: jwtBuilder 를 사용하려면 추가해줘야 한다.
+
+	// Swagger-UI: springdoc-openapi
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+
+	// ModelMapper
+	implementation 'org.modelmapper:modelmapper:3.1.1'
+
 }
 
 tasks.named('test') {
