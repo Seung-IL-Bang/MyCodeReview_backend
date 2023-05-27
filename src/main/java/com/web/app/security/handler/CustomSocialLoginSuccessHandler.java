@@ -42,7 +42,7 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
                 .scheme("http")
                 .host("localhost")
                 .port(3000)
-                .path("/")
+                .path("/token")
                 .build()
                 .toUri()
                 .toString();
@@ -56,7 +56,7 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
         for (Cookie cookie : cookies) {
             cookie.setMaxAge(30 * 60);
             cookie.setDomain("localhost");
-            cookie.setPath("/");
+            cookie.setPath("/token");
             cookie.setSecure(true);
             response.addCookie(cookie);
         }
