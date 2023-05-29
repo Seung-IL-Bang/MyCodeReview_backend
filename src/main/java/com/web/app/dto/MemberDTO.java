@@ -1,4 +1,4 @@
-package com.web.app.security.dto;
+package com.web.app.dto;
 
 import lombok.Getter;
 import lombok.Setter;

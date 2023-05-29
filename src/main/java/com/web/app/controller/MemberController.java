@@ -1,7 +1,7 @@
 package com.web.app.controller;
 
 import com.web.app.domain.member.Member;
-import com.web.app.security.dto.MemberDTO;
+import com.web.app.dto.MemberDTO;
 import com.web.app.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
