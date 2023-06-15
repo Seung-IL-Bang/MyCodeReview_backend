@@ -69,4 +69,5 @@ public class JWTUtil {
 
         return claims.get("email").toString();
     }
+
 }
