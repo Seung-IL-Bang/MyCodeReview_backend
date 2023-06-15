@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Builder
 @Data
@@ -27,5 +30,9 @@ public class PageRequestDTO {
 
     public int getSkip() {
         return (page - 1) * 10;
+    }
+
+    public Pageable getPageable(String... props) {
+        return PageRequest.of(this.page - 1, this.size, Sort.by(props).descending());
     }
 }

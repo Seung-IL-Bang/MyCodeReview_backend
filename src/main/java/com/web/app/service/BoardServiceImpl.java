@@ -7,6 +7,8 @@ import com.web.app.dto.PageResponseDTO;
 import com.web.app.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,9 +52,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public PageResponseDTO<BoardDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO) {
-        List<Board> boardList = boardRepository.getListWithPaging(email, pageRequestDTO.getSkip(), pageRequestDTO.getSize());
 
-        List<BoardDTO> dtoList = boardList.stream()
+        Pageable pageable = pageRequestDTO.getPageable("id");
+
+        Page<Board> result = boardRepository.findByEmailOrderByIdDesc(email, pageable);
+
+        List<BoardDTO> dtoList = result.getContent().stream()
                 .map(board -> modelMapper.map(board, BoardDTO.class))
                 .collect(Collectors.toList());
 
