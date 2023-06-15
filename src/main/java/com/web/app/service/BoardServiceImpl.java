@@ -2,6 +2,8 @@ package com.web.app.service;
 
 import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardDTO;
+import com.web.app.dto.PageRequestDTO;
+import com.web.app.dto.PageResponseDTO;
 import com.web.app.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -43,6 +46,24 @@ public class BoardServiceImpl implements BoardService {
         List<Board> listAll = boardRepository.findListAll(email);
 
         return listAll;
+    }
+
+    @Override
+    public PageResponseDTO<BoardDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO) {
+        List<Board> boardList = boardRepository.getListWithPaging(email, pageRequestDTO.getSkip(), pageRequestDTO.getSize());
+
+        List<BoardDTO> dtoList = boardList.stream()
+                .map(board -> modelMapper.map(board, BoardDTO.class))
+                .collect(Collectors.toList());
+
+        int total = boardRepository.getCount();
+
+        PageResponseDTO<BoardDTO> pageResponseDTO = PageResponseDTO.<BoardDTO>builder()
+                .dtoList(dtoList)
+                .pageRequestDTO(pageRequestDTO)
+                .total(total)
+                .build();
+        return pageResponseDTO;
     }
 
     @Override
