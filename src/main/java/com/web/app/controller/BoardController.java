@@ -30,9 +30,9 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity getBoard(@PathVariable("id") @Positive Long id) {
 
-        Board board = boardService.read(id);
+        BoardDTO boardDTO = boardService.read(id);
 
-        return new ResponseEntity<>(board, HttpStatus.OK);
+        return new ResponseEntity<>(boardDTO, HttpStatus.OK);
     }
 
     @GetMapping("/list")

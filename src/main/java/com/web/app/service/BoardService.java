@@ -11,7 +11,7 @@ public interface BoardService {
 
     public Long register(BoardDTO BoardDTO);
 
-    public Board read(Long id);
+    public BoardDTO read(Long id);
 
     public List<Board> readAll(String email);
 

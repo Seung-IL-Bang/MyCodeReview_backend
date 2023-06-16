@@ -35,11 +35,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board read(Long id) {
+    public BoardDTO read(Long id) {
 
         Optional<Board> result = boardRepository.findById(id);
 
-        return result.orElseThrow();
+        Board board = result.orElseThrow();
+
+        BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+
+        return boardDTO;
     }
 
     @Override
