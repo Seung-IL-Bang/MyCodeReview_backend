@@ -76,10 +76,10 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board modify(BoardDTO boardDTO) {
+    public Board modify(Long id, BoardDTO boardDTO) {
 
         // TODO: 작성자만 수정 가능
-        Optional<Board> result = boardRepository.findById(boardDTO.getId());
+        Optional<Board> result = boardRepository.findById(id);
 
         Board board = result.orElseThrow();
 

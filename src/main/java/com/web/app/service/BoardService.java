@@ -17,7 +17,7 @@ public interface BoardService {
 
     public PageResponseDTO<BoardDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO);
 
-    public Board modify(BoardDTO BoardDTO);
+    public Board modify(Long id, BoardDTO BoardDTO);
 
     public void remove(Long id);
 

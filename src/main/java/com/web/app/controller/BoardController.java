@@ -65,10 +65,10 @@ public class BoardController {
         return new ResponseEntity(id, HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public ResponseEntity putBoard(@RequestBody BoardDTO boardDTO) {
+    @PutMapping("/{id}")
+    public ResponseEntity putBoard(@PathVariable("id") @Positive Long id, @RequestBody BoardDTO boardDTO) {
 
-        Board board = boardService.modify(boardDTO);
+        Board board = boardService.modify(id, boardDTO);
 
         return new ResponseEntity(board, HttpStatus.OK);
     }
