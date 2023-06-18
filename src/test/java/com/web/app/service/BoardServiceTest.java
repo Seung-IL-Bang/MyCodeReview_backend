@@ -42,9 +42,9 @@ public class BoardServiceTest {
 
         Long id = 1L;
 
-        Board board = boardService.read(id);
+        BoardDTO read = boardService.read(id);
 
-        log.info("board: " + board);
+        log.info("board: " + read);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class BoardServiceTest {
                 .email("test@gmail.com")
                 .build();
 
-        Board board = boardService.modify(boardDTO);
+        Board board = boardService.modify(1L, boardDTO);
 
         log.info("Updated Board : " + board);
     }
