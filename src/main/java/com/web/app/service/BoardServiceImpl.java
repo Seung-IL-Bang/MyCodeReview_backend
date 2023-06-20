@@ -4,7 +4,9 @@ import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
+import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final ModelMapper modelMapper;
+    private final GetEmailFromJWT getEmailFromJWT;
 
     @Override
     public Long register(BoardDTO boardDTO) {
@@ -76,22 +79,33 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board modify(Long id, BoardDTO boardDTO) {
+    public Board modify(HttpServletRequest request, Long id, BoardDTO boardDTO) {
 
-        // TODO: 작성자만 수정 가능
         Optional<Board> result = boardRepository.findById(id);
 
         Board board = result.orElseThrow();
+
+        String email = getEmailFromJWT.execute(request);
+
+        if (!board.getEmail().equals(email)) {
+            throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
+        }
 
         board.change(boardDTO.getTitle(), boardDTO.getContent());
         return boardRepository.save(board);
     }
 
     @Override
-    public void remove(Long id) {
-        // TODO: 작성자만 삭제 가능
+    public void remove(HttpServletRequest request, Long id) {
         // 예외 처리를 위해 deleteById 미사용
         Board board = boardRepository.findById(id).orElseThrow();
+
+        String email = getEmailFromJWT.execute(request);
+
+        if (!board.getEmail().equals(email)) {
+            throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
+        }
+
         boardRepository.delete(board);
     }
 }

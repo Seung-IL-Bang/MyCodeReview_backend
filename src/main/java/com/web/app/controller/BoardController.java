@@ -66,15 +66,15 @@ public class BoardController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity putBoard(@PathVariable("id") @Positive Long id, @RequestBody BoardDTO boardDTO) {
+    public ResponseEntity putBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id, @RequestBody BoardDTO boardDTO) {
 
-        Board board = boardService.modify(id, boardDTO);
+        Board board = boardService.modify(request, id, boardDTO);
 
         return new ResponseEntity(board, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBoard(@PathVariable("id") @Positive Long id) {
-        boardService.remove(id);
+    public void deleteBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id) {
+        boardService.remove(request, id);
     }
 }

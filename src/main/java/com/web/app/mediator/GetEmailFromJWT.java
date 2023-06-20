@@ -14,7 +14,6 @@ import java.util.List;
 public class GetEmailFromJWT {
 
     private final JWTUtil jwtUtil;
-    private final BoardService boardService;
 
     public String execute(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");

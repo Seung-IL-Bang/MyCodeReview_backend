@@ -2,6 +2,7 @@ package com.web.app.service;
 
 import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,7 @@ public class BoardServiceTest {
 
     @Test
     @DisplayName("Modify Board")
-    public void testModify() {
+    public void testModify(HttpServletRequest request) {
         BoardDTO boardDTO = BoardDTO.builder()
                 .id(1L)
                 .title("updated title")
@@ -57,17 +58,17 @@ public class BoardServiceTest {
                 .email("test@gmail.com")
                 .build();
 
-        Board board = boardService.modify(1L, boardDTO);
+        Board board = boardService.modify(request, 1L, boardDTO);
 
         log.info("Updated Board : " + board);
     }
 
     @Test
     @DisplayName("Delete Board")
-    public void testDelete() {
+    public void testDelete(HttpServletRequest request) {
         Long id = 2L;
 
-        boardService.remove(id);
+        boardService.remove(request, id);
     }
 
     @Test
