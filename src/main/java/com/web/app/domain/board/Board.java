@@ -38,9 +38,10 @@ public class Board extends BaseTimeEntity {
     private Set<String> tagList;
 
 
-    public void change(String title, String content) {
+    public void change(String title, String content, Set<String> tagList) {
         this.title = title;
         this.content = content;
+        this.tagList = tagList;
     }
 
 

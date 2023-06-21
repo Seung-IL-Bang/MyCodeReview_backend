@@ -91,7 +91,7 @@ public class BoardServiceImpl implements BoardService {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
-        board.change(boardDTO.getTitle(), boardDTO.getContent());
+        board.change(boardDTO.getTitle(), boardDTO.getContent(), boardDTO.getTagList());
         return boardRepository.save(board);
     }
 
