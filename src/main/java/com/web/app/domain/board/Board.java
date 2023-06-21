@@ -31,6 +31,9 @@ public class Board extends BaseTimeEntity {
     @Column(length = 50, nullable = false)
     private String email;
 
+    @Column(length = 10)
+    private String difficulty;
+
     @Column
     private String link;
 
@@ -38,10 +41,12 @@ public class Board extends BaseTimeEntity {
     private Set<String> tagList;
 
 
-    public void change(String title, String content, Set<String> tagList) {
+    public void change(String title, String content, Set<String> tagList, String link, String difficulty) {
         this.title = title;
         this.content = content;
         this.tagList = tagList;
+        this.link = link;
+        this.difficulty = difficulty;
     }
 
 

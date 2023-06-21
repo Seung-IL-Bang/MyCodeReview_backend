@@ -15,6 +15,8 @@ public class BoardDTO {
     private String title;
     private String content;
     private Set<String> tagList;
+    private String link;
+    private String difficulty;
     private String writer;
     private String email;
 }
