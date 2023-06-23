@@ -1,3 +1,10 @@
+// buildscript for QueryDsl
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.0'
@@ -60,8 +67,25 @@ dependencies {
 	// ModelMapper
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 
+	// QueryDsl; SpringBoot 3.0 이상부터 (javax -> jakarta) 라이브러리명 변경 사항을 반영해줘야 QClass 가 생성된다.
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+	annotationProcessor (
+			'jakarta.persistence:jakarta.persistence-api:3.1.0', // version 명시로 해결 -> [ERROR] Could not resolve all files for configuration ':compileClasspath'.
+			'jakarta.annotation:jakarta.annotation-api:2.1.1', // version 명시로 해결 -> [ERROR] Could not resolve all files for configuration ':compileClasspath'.
+			"com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+	)
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// sourceSets for QueryDsl
+sourceSets {
+	main {
+		java {
+			srcDirs = ["$projectDir/src/main/java"]
+		}
+	}
 }
