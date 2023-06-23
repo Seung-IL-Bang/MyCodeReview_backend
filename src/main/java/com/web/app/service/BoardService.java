@@ -18,6 +18,8 @@ public interface BoardService {
 
     public PageResponseDTO<BoardDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO);
 
+    public PageResponseDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO);
+
     public Board modify(HttpServletRequest request, Long id, BoardDTO BoardDTO);
 
     public void remove(HttpServletRequest request, Long id);

@@ -28,6 +28,12 @@ public class PageRequestDTO {
     @Positive
     private int size = 8;
 
+    private String[] types; // [k]eyword, [d]ifficulty, [t]ag
+    private String keyword;
+    private String difficulty;
+    private String tag;
+
+
     public int getSkip() {
         return (page - 1) * 10;
     }
