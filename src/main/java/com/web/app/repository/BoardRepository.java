@@ -1,6 +1,7 @@
 package com.web.app.repository;
 
 import com.web.app.domain.board.Board;
+import com.web.app.repository.search.BoardSearch;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch {
 
     @Query("select b from Board b where b.email = :email")
     List<Board> findListAll(String email);
