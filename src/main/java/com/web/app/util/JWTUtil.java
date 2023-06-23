@@ -57,4 +57,17 @@ public class JWTUtil {
 
         return claims;
     }
+
+    public String getEmail(String token) throws JwtException {
+
+        Map<String, Object> claims = null;
+
+        claims = Jwts.parser()
+                .setSigningKey(key.getBytes())
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("email").toString();
+    }
+
 }
