@@ -79,6 +79,33 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    public PageResponseDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
+
+        Pageable pageable = pageRequestDTO.getPageable("id");
+
+        String[] types = pageRequestDTO.getTypes();
+
+        String difficulty = pageRequestDTO.getDifficulty();
+
+        String keyword = pageRequestDTO.getKeyword();
+
+        String tag = pageRequestDTO.getTag();
+
+
+        Page<Board> result = boardRepository.searchAll(types, email, keyword, difficulty, tag, pageable);
+
+        List<BoardDTO> dtoList = result.getContent().stream()
+                .map(board -> modelMapper.map(board, BoardDTO.class))
+                .collect(Collectors.toList());
+
+        return PageResponseDTO.<BoardDTO>builder()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(dtoList)
+                .total((int) result.getTotalElements())
+                .build();
+    }
+
+    @Override
     public Board modify(HttpServletRequest request, Long id, BoardDTO boardDTO) {
 
         Optional<Board> result = boardRepository.findById(id);
