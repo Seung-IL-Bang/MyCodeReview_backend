@@ -57,6 +57,20 @@ public class BoardController {
         return new ResponseEntity(pageResponseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/v2/list")
+    public ResponseEntity getBoardListWithPagingAndSearch(@Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult, HttpServletRequest request) {
+
+        if (bindingResult.hasErrors()) {
+            pageRequestDTO = PageRequestDTO.builder().build();
+        }
+
+        String email = getEmailFromJWT.execute(request);
+
+        PageResponseDTO<BoardDTO> pageResponseDTO = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
+
+        return new ResponseEntity(pageResponseDTO, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity postBoard(@RequestBody BoardDTO boardDTO) {
 
