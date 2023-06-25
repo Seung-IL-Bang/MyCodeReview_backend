@@ -4,6 +4,7 @@ import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
+import com.web.app.dto.PageResponseWithCategoryDTO;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,8 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,7 +68,7 @@ public class BoardServiceImpl implements BoardService {
                 .map(board -> modelMapper.map(board, BoardDTO.class))
                 .collect(Collectors.toList());
 
-        int total = boardRepository.getCount();
+        int total = boardRepository.getCount(email);
 
         PageResponseDTO<BoardDTO> pageResponseDTO = PageResponseDTO.<BoardDTO>builder()
                 .dtoList(dtoList)
@@ -78,8 +78,9 @@ public class BoardServiceImpl implements BoardService {
         return pageResponseDTO;
     }
 
+    // Version 2
     @Override
-    public PageResponseDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
+    public PageResponseWithCategoryDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("id");
 
@@ -91,17 +92,38 @@ public class BoardServiceImpl implements BoardService {
 
         String tag = pageRequestDTO.getTag();
 
+        List<Board> boards = boardRepository.findListAll(email);
 
         Page<Board> result = boardRepository.searchAll(types, email, keyword, difficulty, tag, pageable);
 
+        // 사용자별 태그 목록
+        Map<String, Integer> dtoTags = new HashMap<>();
+        // 사용자별 태그 목록 집계
+        boards.stream()
+                .forEach(board -> board.getTagList().stream().forEach(t ->
+
+                        {
+                            if (dtoTags.containsKey(t)) {
+                                Integer freq = dtoTags.get(t);
+                                dtoTags.put(t, ++freq);
+                            } else {
+                                dtoTags.put(t, 1);
+                            }
+                        }
+                ));
+
+
+        // 게시글 목록
         List<BoardDTO> dtoList = result.getContent().stream()
                 .map(board -> modelMapper.map(board, BoardDTO.class))
                 .collect(Collectors.toList());
 
-        return PageResponseDTO.<BoardDTO>builder()
+
+        return PageResponseWithCategoryDTO.<BoardDTO>builder()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
-                .total((int) result.getTotalElements())
+                .dtoTags(dtoTags)
+                .total(boards.size()) // 필터링된 개수가 아니고, 필터링 하기 전 총 개수
                 .build();
     }
 
