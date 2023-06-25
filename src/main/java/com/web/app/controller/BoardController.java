@@ -4,6 +4,7 @@ import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
+import com.web.app.dto.PageResponseWithCategoryDTO;
 import com.web.app.mediator.GetBoardListFromEmailOfJWT;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.service.BoardService;
@@ -66,9 +67,9 @@ public class BoardController {
 
         String email = getEmailFromJWT.execute(request);
 
-        PageResponseDTO<BoardDTO> pageResponseDTO = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
+        PageResponseWithCategoryDTO<BoardDTO> response = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
 
-        return new ResponseEntity(pageResponseDTO, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @PostMapping

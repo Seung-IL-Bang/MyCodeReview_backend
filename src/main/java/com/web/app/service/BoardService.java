@@ -4,6 +4,7 @@ import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
+import com.web.app.dto.PageResponseWithCategoryDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -18,10 +19,9 @@ public interface BoardService {
 
     public PageResponseDTO<BoardDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO);
 
-    public PageResponseDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO);
+    public PageResponseWithCategoryDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO);
 
     public Board modify(HttpServletRequest request, Long id, BoardDTO BoardDTO);
 
     public void remove(HttpServletRequest request, Long id);
-
 }

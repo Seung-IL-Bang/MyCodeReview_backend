@@ -14,8 +14,8 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch
     @Query("select b from Board b where b.email = :email")
     List<Board> findListAll(String email);
 
-    @Query("select count(b.id) from Board b")
-    int getCount();
+    @Query("select count(b.id) from Board b where b.email = :email")
+    int getCount(String email);
 
     // ** Deprecated **
     // nativeQuery 사용한 페이징 목록 조회
