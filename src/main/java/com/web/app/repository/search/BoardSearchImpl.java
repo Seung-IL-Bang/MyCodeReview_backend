@@ -19,7 +19,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
 
     @Override
-    public Page<Board> searchAll(String[] types, String email, String keyword, String difficulty, String tag, Pageable pageable) {
+    public Page<Board> searchAll(String[] types, String email, String keyword, String[] difficulties, String tag, Pageable pageable) {
         QBoard board = QBoard.board;
 
         JPQLQuery<Board> query = from(board);
@@ -35,7 +35,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
                         booleanBuilder.or(board.title.contains(keyword)); // title like ...
                         break;
                     case "d" :
-                        booleanBuilder.or(board.difficulty.eq(difficulty)); // difficulty like ...
+                        booleanBuilder.or(board.difficulty.in(difficulties));
                         break;
                     case "t":
                         booleanBuilder.or(board.tagList.contains(tag));

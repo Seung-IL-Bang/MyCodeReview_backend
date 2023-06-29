@@ -86,7 +86,7 @@ public class BoardServiceImpl implements BoardService {
 
         String[] types = pageRequestDTO.getTypes();
 
-        String difficulty = pageRequestDTO.getDifficulty();
+        String[] difficulties = pageRequestDTO.getDifficulties();
 
         String keyword = pageRequestDTO.getKeyword();
 
@@ -94,7 +94,7 @@ public class BoardServiceImpl implements BoardService {
 
         List<Board> boards = boardRepository.findListAll(email);
 
-        Page<Board> result = boardRepository.searchAll(types, email, keyword, difficulty, tag, pageable);
+        Page<Board> result = boardRepository.searchAll(types, email, keyword, difficulties, tag, pageable);
 
         // 사용자별 태그 목록
         Map<String, Integer> dtoTags = new HashMap<>();
@@ -124,6 +124,7 @@ public class BoardServiceImpl implements BoardService {
                 .dtoList(dtoList)
                 .dtoTags(dtoTags)
                 .total(boards.size()) // 필터링된 개수가 아니고, 필터링 하기 전 총 개수
+                .filteredTotal(dtoList.size())
                 .build();
     }
 

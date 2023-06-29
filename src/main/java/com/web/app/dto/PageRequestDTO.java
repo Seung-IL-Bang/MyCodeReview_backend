@@ -30,7 +30,7 @@ public class PageRequestDTO {
 
     private String[] types; // [k]eyword, [d]ifficulty, [t]ag
     private String keyword;
-    private String difficulty;
+    private String[] difficulties;
     private String tag;
 
 
