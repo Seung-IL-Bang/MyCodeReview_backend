@@ -14,7 +14,7 @@ public class PageResponseWithCategoryDTO<E> {
     private int page;
     private int size;
     private int total; // 검색 & 필터링 전 총 게시글 개수
-    private int filteredTotal; // 검색 & 필터링된 게시글 개수
+    private long filteredTotal; // 검색 & 필터링된 게시글 개수
 
     // 시작 페이지 번호
     private int start;
@@ -30,8 +30,8 @@ public class PageResponseWithCategoryDTO<E> {
 
     private Map<String, Integer> dtoTags;
 
-    @Builder
-    public PageResponseWithCategoryDTO(PageRequestDTO pageRequestDTO, List<E> dtoList, int total, Map<String, Integer> dtoTags, int filteredTotal) {
+    @Builder(builderMethodName = "of", builderClassName = "of")
+    private PageResponseWithCategoryDTO(PageRequestDTO pageRequestDTO, List<E> dtoList, int total, Map<String, Integer> dtoTags, long filteredTotal) {
 
         this.page = pageRequestDTO.getPage();
         this.size = pageRequestDTO.getSize();
@@ -40,18 +40,48 @@ public class PageResponseWithCategoryDTO<E> {
         this.dtoTags = dtoTags;
         this.filteredTotal = filteredTotal;
 
-        this.end = (int)(Math.ceil(this.page / 10.0)) * 10;
+        this.end = (int) (Math.ceil(this.page / 10.0)) * 10;
 
         this.start = end - 9;
 
-        int last = (int)(Math.ceil(total/(double) size));
+        int last = 0;
+        if (total != filteredTotal) { // 검색 || 필터링 조회
+            last = (int) (Math.ceil(filteredTotal / (double) size));
+        } else { // 전체 조회
+            last = (int) (Math.ceil(total / (double) size));
+        }
 
         this.end = Math.min(end, last);
 
         this.prev = this.start > 1;
 
-        this.next = total > this.end * this.size;
+        if (total != filteredTotal) { // 검색 || 필터링 조회
+            this.next = filteredTotal > this.end * this.size;
+        } else { // 전체 조회
+            this.next = total > this.end * this.size;
+        }
+    }
 
+    @Builder(builderMethodName = "withAll")
+    public static PageResponseWithCategoryDTO builderByAll(PageRequestDTO pageRequestDTO, List<BoardDTO> dtoList, int total, Map<String, Integer> dtoTags) {
+
+        return PageResponseWithCategoryDTO.<BoardDTO>of()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(dtoList)
+                .total(total)
+                .dtoTags(dtoTags)
+                .filteredTotal(total).build();
+    }
+
+    @Builder(builderMethodName = "withFilter")
+    public static PageResponseWithCategoryDTO builderByFilter(PageRequestDTO pageRequestDTO, List<BoardDTO> dtoList, int total, Map<String, Integer> dtoTags, long filteredTotal) {
+
+        return PageResponseWithCategoryDTO.<BoardDTO>of()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(dtoList)
+                .total(total)
+                .dtoTags(dtoTags)
+                .filteredTotal(filteredTotal).build();
     }
 
 }
