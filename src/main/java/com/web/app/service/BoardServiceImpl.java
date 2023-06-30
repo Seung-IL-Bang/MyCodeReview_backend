@@ -96,6 +96,11 @@ public class BoardServiceImpl implements BoardService {
 
         Page<Board> result = boardRepository.searchAll(types, email, keyword, difficulties, tag, pageable);
 
+        long filteredTotal = 0;
+        if (types != null) {
+            filteredTotal = boardRepository.filteredAll(types, email, keyword, difficulties, tag);
+        }
+
         // 사용자별 태그 목록
         Map<String, Integer> dtoTags = new HashMap<>();
         // 사용자별 태그 목록 집계
@@ -118,14 +123,13 @@ public class BoardServiceImpl implements BoardService {
                 .map(board -> modelMapper.map(board, BoardDTO.class))
                 .collect(Collectors.toList());
 
+        // 전체 조회 응답
+        if (types == null) {
+            return PageResponseWithCategoryDTO.builderByAll(pageRequestDTO, dtoList, boards.size(), dtoTags); // boards.size() : 필터링된 개수가 아니고, 필터링 하기 전 총 개수
+        }
 
-        return PageResponseWithCategoryDTO.<BoardDTO>builder()
-                .pageRequestDTO(pageRequestDTO)
-                .dtoList(dtoList)
-                .dtoTags(dtoTags)
-                .total(boards.size()) // 필터링된 개수가 아니고, 필터링 하기 전 총 개수
-                .filteredTotal(dtoList.size())
-                .build();
+        // 검색 || 필터링 응답
+        return PageResponseWithCategoryDTO.builderByFilter(pageRequestDTO, dtoList, boards.size(), dtoTags, filteredTotal);
     }
 
     @Override
