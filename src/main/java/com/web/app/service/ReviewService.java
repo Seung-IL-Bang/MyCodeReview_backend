@@ -7,7 +7,7 @@ public interface ReviewService {
 
     Long register(ReviewDTO reviewDTO);
 
-    Review read(Long id);
+    ReviewDTO read(Long id);
 
 
 }

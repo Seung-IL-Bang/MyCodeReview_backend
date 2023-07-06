@@ -13,4 +13,6 @@ public class ReviewDTO {
     private Long id;
     private String subTitle;
     private String content;
+
+
 }
