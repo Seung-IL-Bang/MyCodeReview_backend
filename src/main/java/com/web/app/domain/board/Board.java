@@ -1,6 +1,7 @@
 package com.web.app.domain.board;
 
 import com.web.app.domain.BaseTimeEntity;
+import com.web.app.domain.review.Review;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +40,9 @@ public class Board extends BaseTimeEntity {
 
     @ElementCollection
     private Set<String> tagList;
+
+    @OneToMany(mappedBy = "board")
+    private List<Review> reviewList;
 
 
     public void change(String title, String content, Set<String> tagList, String link, String difficulty) {
