@@ -1,12 +1,11 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
-import com.web.app.dto.BoardDTO;
-import com.web.app.dto.PageRequestDTO;
-import com.web.app.dto.PageResponseDTO;
-import com.web.app.dto.PageResponseWithCategoryDTO;
+import com.web.app.domain.review.Review;
+import com.web.app.dto.*;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,13 +23,15 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+
+    private final ReviewRepository reviewRepository;
     private final ModelMapper modelMapper;
     private final GetEmailFromJWT getEmailFromJWT;
 
     @Override
-    public Long register(BoardDTO boardDTO) {
+    public Long register(BoardRequestDTO boardRequestDTO) {
 
-        Board board = modelMapper.map(boardDTO, Board.class);
+        Board board = modelMapper.map(boardRequestDTO, Board.class);
 
         Board save = boardRepository.save(board);
 
@@ -38,15 +39,23 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardDTO read(Long id) {
+    public BoardResponseDTO read(Long id) {
 
         Optional<Board> result = boardRepository.findById(id);
 
         Board board = result.orElseThrow();
 
-        BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+        BoardResponseDTO dto = modelMapper.map(board, BoardResponseDTO.class);
 
-        return boardDTO;
+        List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(board);
+
+        List<ReviewListDTO> reviewListDTOS = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewListDTO.class))
+                .collect(Collectors.toList());
+
+        dto.setReviewList(reviewListDTOS);
+
+        return dto;
     }
 
     @Override
@@ -58,19 +67,19 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public PageResponseDTO<BoardDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<BoardRequestDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("id");
 
         Page<Board> result = boardRepository.findByEmailOrderByIdDesc(email, pageable);
 
-        List<BoardDTO> dtoList = result.getContent().stream()
-                .map(board -> modelMapper.map(board, BoardDTO.class))
+        List<BoardRequestDTO> dtoList = result.getContent().stream()
+                .map(board -> modelMapper.map(board, BoardRequestDTO.class))
                 .collect(Collectors.toList());
 
         int total = boardRepository.getCount(email);
 
-        PageResponseDTO<BoardDTO> pageResponseDTO = PageResponseDTO.<BoardDTO>builder()
+        PageResponseDTO<BoardRequestDTO> pageResponseDTO = PageResponseDTO.<BoardRequestDTO>builder()
                 .dtoList(dtoList)
                 .pageRequestDTO(pageRequestDTO)
                 .total(total)
@@ -80,7 +89,7 @@ public class BoardServiceImpl implements BoardService {
 
     // Version 2
     @Override
-    public PageResponseWithCategoryDTO<BoardDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
+    public PageResponseWithCategoryDTO<BoardRequestDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("id");
 
@@ -119,8 +128,8 @@ public class BoardServiceImpl implements BoardService {
 
 
         // 게시글 목록
-        List<BoardDTO> dtoList = result.getContent().stream()
-                .map(board -> modelMapper.map(board, BoardDTO.class))
+        List<BoardRequestDTO> dtoList = result.getContent().stream()
+                .map(board -> modelMapper.map(board, BoardRequestDTO.class))
                 .collect(Collectors.toList());
 
         // 전체 조회 응답
@@ -133,7 +142,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board modify(HttpServletRequest request, Long id, BoardDTO boardDTO) {
+    public Board modify(HttpServletRequest request, Long id, BoardRequestDTO boardRequestDTO) {
 
         Optional<Board> result = boardRepository.findById(id);
 
@@ -145,12 +154,14 @@ public class BoardServiceImpl implements BoardService {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
-        board.change(boardDTO.getTitle(), boardDTO.getContent(), boardDTO.getTagList(), boardDTO.getLink(), boardDTO.getDifficulty());
+        board.change(boardRequestDTO.getTitle(), boardRequestDTO.getContent(), boardRequestDTO.getTagList(), boardRequestDTO.getLink(), boardRequestDTO.getDifficulty());
         return boardRepository.save(board);
     }
 
     @Override
     public void remove(HttpServletRequest request, Long id) {
+
+
         // 예외 처리를 위해 deleteById 미사용
         Board board = boardRepository.findById(id).orElseThrow();
 
@@ -159,6 +170,9 @@ public class BoardServiceImpl implements BoardService {
         if (!board.getEmail().equals(email)) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
+
+        // 외래키 제약조건에 의해 Reviews 먼저 삭제
+        reviewRepository.deleteReviewsByBoardIs(board);
 
         boardRepository.delete(board);
     }

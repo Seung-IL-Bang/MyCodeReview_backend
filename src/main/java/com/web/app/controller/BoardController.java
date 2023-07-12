@@ -1,10 +1,7 @@
 package com.web.app.controller;
 
 import com.web.app.domain.board.Board;
-import com.web.app.dto.BoardDTO;
-import com.web.app.dto.PageRequestDTO;
-import com.web.app.dto.PageResponseDTO;
-import com.web.app.dto.PageResponseWithCategoryDTO;
+import com.web.app.dto.*;
 import com.web.app.mediator.GetBoardListFromEmailOfJWT;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.service.BoardService;
@@ -31,9 +28,9 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity getBoard(@PathVariable("id") @Positive Long id) {
 
-        BoardDTO boardDTO = boardService.read(id);
+        BoardResponseDTO response = boardService.read(id);
 
-        return new ResponseEntity<>(boardDTO, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/list")
@@ -52,7 +49,7 @@ public class BoardController {
         }
 
         String email = getEmailFromJWT.execute(request);
-        PageResponseDTO<BoardDTO> pageResponseDTO = boardService.readAllWithPaging(email, pageRequestDTO);
+        PageResponseDTO<BoardRequestDTO> pageResponseDTO = boardService.readAllWithPaging(email, pageRequestDTO);
 
 
         return new ResponseEntity(pageResponseDTO, HttpStatus.OK);
@@ -67,23 +64,23 @@ public class BoardController {
 
         String email = getEmailFromJWT.execute(request);
 
-        PageResponseWithCategoryDTO<BoardDTO> response = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
+        PageResponseWithCategoryDTO<BoardRequestDTO> response = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity postBoard(@RequestBody BoardDTO boardDTO) {
+    public ResponseEntity postBoard(@RequestBody BoardRequestDTO boardRequestDTO) {
 
-        Long id = boardService.register(boardDTO);
+        Long id = boardService.register(boardRequestDTO);
 
         return new ResponseEntity(id, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity putBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id, @RequestBody BoardDTO boardDTO) {
+    public ResponseEntity putBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id, @RequestBody BoardRequestDTO boardRequestDTO) {
 
-        Board board = boardService.modify(request, id, boardDTO);
+        Board board = boardService.modify(request, id, boardRequestDTO);
 
         return new ResponseEntity(board, HttpStatus.OK);
     }

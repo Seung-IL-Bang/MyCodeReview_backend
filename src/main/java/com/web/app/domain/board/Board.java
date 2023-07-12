@@ -4,7 +4,6 @@ import com.web.app.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -39,7 +38,6 @@ public class Board extends BaseTimeEntity {
 
     @ElementCollection
     private Set<String> tagList;
-
 
     public void change(String title, String content, Set<String> tagList, String link, String difficulty) {
         this.title = title;
