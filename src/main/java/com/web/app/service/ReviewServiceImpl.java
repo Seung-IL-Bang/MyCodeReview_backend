@@ -2,11 +2,17 @@ package com.web.app.service;
 
 import com.web.app.domain.board.Board;
 import com.web.app.domain.review.Review;
+import com.web.app.dto.ReviewListDTO;
 import com.web.app.dto.ReviewRequestDTO;
+import com.web.app.dto.ReviewResponseDTO;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -14,6 +20,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final BoardRepository boardRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Long register(Review review, Long boardId) {
@@ -26,10 +33,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Review read(Long id) {
+    public ReviewResponseDTO read(Long id) {
 
-        Review review = reviewRepository.findById(id).orElseThrow();
-        return review;
+        Review findReview = reviewRepository.findById(id).orElseThrow();
+
+        List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(findReview.getBoard());
+
+        List<ReviewListDTO> reviewListDTOS = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewListDTO.class))
+                .collect(Collectors.toList());
+
+        ReviewResponseDTO responseDTO = findReview.toResponseDTO(reviewListDTOS);
+
+        return responseDTO;
     }
 
     @Override
