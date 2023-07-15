@@ -89,7 +89,7 @@ public class BoardServiceImpl implements BoardService {
 
     // Version 2
     @Override
-    public PageResponseWithCategoryDTO<BoardResponseDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
+    public PageResponseWithCategoryDTO<BoardListResponseDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("id");
 
@@ -128,8 +128,8 @@ public class BoardServiceImpl implements BoardService {
 
 
         // 게시글 목록
-        List<BoardResponseDTO> dtoList = result.getContent().stream()
-                .map(board -> modelMapper.map(board, BoardResponseDTO.class))
+        List<BoardListResponseDTO> dtoList = result.getContent().stream()
+                .map(board -> modelMapper.map(board, BoardListResponseDTO.class))
                 .collect(Collectors.toList());
 
         // 전체 조회 응답
