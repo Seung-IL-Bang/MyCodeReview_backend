@@ -2,9 +2,12 @@ package com.web.app.domain.review;
 
 import com.web.app.domain.BaseTimeEntity;
 import com.web.app.domain.board.Board;
+import com.web.app.dto.ReviewListDTO;
 import com.web.app.dto.ReviewResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,7 +40,7 @@ public class Review extends BaseTimeEntity {
         this.board = board;
     }
 
-    public ReviewResponseDTO toResponseDTO() {
+    public ReviewResponseDTO toResponseDTO(List<ReviewListDTO> reviewListDTOS) {
         return ReviewResponseDTO.builder()
                 .id(id)
                 .boardId(board.getId())
@@ -45,6 +48,7 @@ public class Review extends BaseTimeEntity {
                 .subTitle(subTitle)
                 .content(content)
                 .tagList(board.getTagList())
+                .reviewList(reviewListDTOS)
                 .link(board.getLink())
                 .difficulty(board.getDifficulty())
                 .writer(board.getWriter())
