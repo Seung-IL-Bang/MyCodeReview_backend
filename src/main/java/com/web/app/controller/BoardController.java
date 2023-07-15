@@ -64,7 +64,7 @@ public class BoardController {
 
         String email = getEmailFromJWT.execute(request);
 
-        PageResponseWithCategoryDTO<BoardRequestDTO> response = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
+        PageResponseWithCategoryDTO<BoardResponseDTO> response = boardService.readAllWithPagingAndSearch(email, pageRequestDTO);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

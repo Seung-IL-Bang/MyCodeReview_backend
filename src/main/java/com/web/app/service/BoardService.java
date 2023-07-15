@@ -16,7 +16,7 @@ public interface BoardService {
 
     public PageResponseDTO<BoardRequestDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO);
 
-    public PageResponseWithCategoryDTO<BoardRequestDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO);
+    public PageResponseWithCategoryDTO<BoardResponseDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO);
 
     public Board modify(HttpServletRequest request, Long id, BoardRequestDTO BoardRequestDTO);
 
