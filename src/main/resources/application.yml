@@ -49,3 +49,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+com:
+  web:
+    jwt:
+      secret: ${JWT_SECRET}
