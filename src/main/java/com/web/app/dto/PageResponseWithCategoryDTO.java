@@ -63,9 +63,9 @@ public class PageResponseWithCategoryDTO<E> {
     }
 
     @Builder(builderMethodName = "withAll")
-    public static PageResponseWithCategoryDTO builderByAll(PageRequestDTO pageRequestDTO, List<BoardRequestDTO> dtoList, int total, Map<String, Integer> dtoTags) {
+    public static PageResponseWithCategoryDTO builderByAll(PageRequestDTO pageRequestDTO, List<BoardListResponseDTO> dtoList, int total, Map<String, Integer> dtoTags) {
 
-        return PageResponseWithCategoryDTO.<BoardRequestDTO>of()
+        return PageResponseWithCategoryDTO.<BoardListResponseDTO>of()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
                 .total(total)
@@ -74,9 +74,9 @@ public class PageResponseWithCategoryDTO<E> {
     }
 
     @Builder(builderMethodName = "withFilter")
-    public static PageResponseWithCategoryDTO builderByFilter(PageRequestDTO pageRequestDTO, List<BoardRequestDTO> dtoList, int total, Map<String, Integer> dtoTags, long filteredTotal) {
+    public static PageResponseWithCategoryDTO builderByFilter(PageRequestDTO pageRequestDTO, List<BoardListResponseDTO> dtoList, int total, Map<String, Integer> dtoTags, long filteredTotal) {
 
-        return PageResponseWithCategoryDTO.<BoardRequestDTO>of()
+        return PageResponseWithCategoryDTO.<BoardListResponseDTO>of()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
                 .total(total)

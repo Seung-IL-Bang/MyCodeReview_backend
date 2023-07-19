@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class ReviewListDTO {
 
     private Long id;
+    private String content;
     private String subTitle;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

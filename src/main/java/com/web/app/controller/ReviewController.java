@@ -22,9 +22,7 @@ public class ReviewController {
     @GetMapping("/{id}")
     public ResponseEntity getReview(@PathVariable("id") @Positive Long id) {
 
-        Review review = reviewService.read(id);
-
-        ReviewResponseDTO response = review.toResponseDTO();
+        ReviewResponseDTO response = reviewService.read(id);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
