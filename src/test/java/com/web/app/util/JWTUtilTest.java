@@ -1,5 +1,6 @@
 package com.web.app.util;
 
+import com.web.app.config.CustomSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

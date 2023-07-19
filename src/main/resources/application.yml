@@ -37,7 +37,7 @@ spring:
       on-profile: test
 
   datasource:
-    url: jdbc:h2:mem:~/MycodeReviewApplication
+    url: jdbc:h2:mem:~/MyCodeReviewApplication
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -52,4 +52,4 @@ spring:
 com:
   web:
     jwt:
-      secret: ${JWT_SECRET}
+      secret: testKey
