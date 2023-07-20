@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,6 +32,22 @@ class JWTUtilTest {
 
         // then
         assertThat(token).isNotBlank();
+    }
+
+    @DisplayName("권한이 필요한 API 요청이 들어온 경우 토큰이 유효한지 검증한다.")
+    @Test
+    void validateToken() {
+        //given
+        Map<String, Object> claims = Map.of("email", "test@gmail.com", "role", "ROLE_USER");
+        String token = jwtUtil.generateToken(claims, 1);
+
+
+        // when
+        Map<String, Object> result = jwtUtil.validateToken(token);
+
+        // then
+        assertThat(result.get("email")).isEqualTo("test@gmail.com");
+        assertThat(result.get("role")).isEqualTo("ROLE_USER");
     }
 
 }
