@@ -50,4 +50,21 @@ class JWTUtilTest {
         assertThat(result.get("role")).isEqualTo("ROLE_USER");
     }
 
+    @DisplayName("JWT 토큰이 담긴 요청이 올 경우 해당 토큰의 claims 에서 이메일 정보를 가져온다.")
+    @Test
+    void getEmail() {
+        // given
+        Map<String, Object> claims = Map.of("email", "test@gmail.com", "role", "ROLE_USER");
+        String token = jwtUtil.generateToken(claims, 1);
+
+        // when
+        String email = jwtUtil.getEmail(token);
+
+        // then
+        assertThat(email).isEqualTo("test@gmail.com");
+
+    }
+
+
+
 }
