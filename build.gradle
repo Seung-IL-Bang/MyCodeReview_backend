@@ -78,6 +78,9 @@ dependencies {
 			"com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
 	)
 
+	// EasyRandom
+	testImplementation 'org.jeasy:easy-random-core:5.0.0'
+
 }
 
 tasks.named('test') {
