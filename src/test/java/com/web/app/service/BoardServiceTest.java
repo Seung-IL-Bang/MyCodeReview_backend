@@ -3,6 +3,7 @@ package com.web.app.service;
 import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
+import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.repository.BoardRepository;
 import com.web.app.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
@@ -45,14 +46,10 @@ public class BoardServiceTest {
     @DisplayName("사용자가 입력한 데이터로 게시글을 작성한다.")
     public void testRegister() {
         // given
-        String title = "board title";
-        String content = "board content";
-        String writer = "방승일";
-        String email = "test@gmail.com";
-        BoardRequestDTO boardRequestDTO = createBoardDTO(email, title, content, writer);
+        BoardRequestDTO requestDTO = BoardFixtureFactory.createRequestDTO();
 
         // when
-        Long id = boardService.register(boardRequestDTO);
+        Long id = boardService.register(requestDTO);
 
         // then
         assertThat(id).isNotNull();
@@ -63,11 +60,7 @@ public class BoardServiceTest {
     @DisplayName("게시글 Id로 해당 게시글을 조회한다.")
     public void testRead() {
         // given
-        String title = "board title";
-        String content = "board content";
-        String writer = "방승일";
-        String email = "test@gmail.com";
-        Board board = createBoard(title, content, writer, email);
+        Board board = BoardFixtureFactory.create();
 
         Long id = boardRepository.save(board).getId();
 
@@ -76,36 +69,31 @@ public class BoardServiceTest {
 
         // then
         assertThat(read.getId()).isEqualTo(id);
-        assertThat(read.getTitle()).isEqualTo(title);
-        assertThat(read.getContent()).isEqualTo(content);
-        assertThat(read.getWriter()).isEqualTo(writer);
-        assertThat(read.getEmail()).isEqualTo(email);
+        assertThat(read.getTitle()).isEqualTo(board.getTitle());
+        assertThat(read.getContent()).isEqualTo(board.getContent());
+        assertThat(read.getWriter()).isEqualTo(board.getWriter());
+        assertThat(read.getEmail()).isEqualTo(board.getEmail());
     }
 
     @Test
     @DisplayName("게시글 수정은 작성자만 가능합니다.")
     public void testModify() {
         // given
-        String title = "board title";
-        String content = "board content";
-        String writer = "방승일";
-        String email = "test@gmail.com";
-        Board board = createBoard(title, content, writer, email);
+        Board board = BoardFixtureFactory.create(1L);
         Long id = boardRepository.save(board).getId();
 
-        String updated_title = "updated title";
-        String updated_content = "updated content";
-        BoardRequestDTO newBoardRequestDTO = createBoardDTO(email, updated_title, updated_content, writer);
+        BoardRequestDTO updateRequestDTO = BoardFixtureFactory.createRequestDTO();
 
-        MockHttpServletRequest request = getRequestWithJWT(writer, email);
+        MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
 
         // when
-        Board newBoard = boardService.modify(request, id, newBoardRequestDTO);
+        Board newBoard = boardService.modify(request, id, updateRequestDTO);
 
         // then
-        assertThat(newBoard.getTitle()).isEqualTo(updated_title);
-        assertThat(newBoard.getContent()).isEqualTo(updated_content);
-        assertThat(newBoard.getEmail()).isEqualTo(email);
+        assertThat(newBoard.getTitle()).isEqualTo(updateRequestDTO.getTitle());
+        assertThat(newBoard.getContent()).isEqualTo(updateRequestDTO.getContent());
+        assertThat(newBoard.getEmail()).isEqualTo(board.getEmail());
+        assertThat(newBoard.getWriter()).isEqualTo(board.getWriter());
     }
 
 
@@ -113,14 +101,10 @@ public class BoardServiceTest {
     @DisplayName("게시글 삭제는 작성자만 가능합니다.")
     public void testDelete() {
         // given
-        String title = "board title";
-        String content = "board content";
-        String writer = "방승일";
-        String email = "test@gmail.com";
-        Board board = createBoard(title, content, writer, email);
+        Board board = BoardFixtureFactory.create();
         Long id = boardRepository.save(board).getId();
 
-        MockHttpServletRequest request = getRequestWithJWT(writer, email);
+        MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
 
         // when
         boardService.remove(request, id);
@@ -135,39 +119,20 @@ public class BoardServiceTest {
     @DisplayName("회원 본인이 작성한 모든 게시글을 조회합니다.")
     public void testReadAll() {
         // given
-        String writer = "방승일";
-        String email = "test@gmail.com";
-        Board board1 = createBoard("title1", "content1", writer, email);
-        Board board2 = createBoard("title2", "content2", writer, email);
-        Board board3 = createBoard("title3", "content3", writer, email);
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
 
         boardRepository.saveAll(List.of(board1, board2, board3));
 
         // when
-        List<Board> boards = boardService.readAll(email);
+        List<Board> boards = boardService.readAll(board1.getEmail());
 
         // then
         assertThat(boards).hasSize(3);
-        assertThat(boards.get(0).getEmail()).isEqualTo(email);
+        assertThat(boards.get(0).getEmail()).isEqualTo(board1.getEmail());
     }
 
-    private static Board createBoard(String title, String content, String writer, String email) {
-        return Board.builder()
-                .title(title)
-                .content(content)
-                .writer(writer)
-                .email(email)
-                .build();
-    }
-
-    private static BoardRequestDTO createBoardDTO(String email, String title, String content, String writer) {
-        return BoardRequestDTO.builder()
-                .title(title)
-                .content(content)
-                .writer(writer)
-                .email(email)
-                .build();
-    }
 
     private MockHttpServletRequest getRequestWithJWT(String writer, String email) {
         MockHttpServletRequest request = new MockHttpServletRequest();
