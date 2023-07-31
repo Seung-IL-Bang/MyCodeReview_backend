@@ -3,6 +3,7 @@ package com.web.app.service;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewResponseDTO;
+import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.ReviewRepository;
 import org.junit.jupiter.api.Disabled;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 @ActiveProfiles("test")
 @Transactional(readOnly = true)
 @SpringBootTest
@@ -30,14 +30,11 @@ class ReviewServiceTest {
     @Autowired
     private BoardRepository boardRepository;
 
-    @DisplayName("서브 리뷰 ID 를 통해 해당 서브 리뷰를 조회한다.")
+    @DisplayName("서브 리뷰 ID 를 통해 해당 서브 리뷰를 조회 한다.")
     @Test
     public void read() {
         // given
-        Board board = Board.builder()
-                .content("content test")
-                .title("title test")
-                .build();
+        Board board = BoardFixtureFactory.create();
         Board savedBoard = boardRepository.save(board);
 
         Review review = Review.builder()
@@ -45,14 +42,14 @@ class ReviewServiceTest {
                 .content("content sub")
                 .board(savedBoard)
                 .build();
-        reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
 
         // when
-        ReviewResponseDTO read = reviewService.read(review.getId());
+        ReviewResponseDTO read = reviewService.read(savedReview.getId());
 
         // then
-        assertThat(read.getContent()).isEqualTo("content sub");
-        assertThat(read.getSubTitle()).isEqualTo("subTitle");
+        assertThat(read.getContent()).isEqualTo(review.getContent());
+        assertThat(read.getSubTitle()).isEqualTo(review.getSubTitle());
 
     }
 }
