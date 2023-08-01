@@ -70,7 +70,7 @@ public class BoardController {
     }
 
     @PostMapping
-    public ResponseEntity postBoard(@RequestBody BoardRequestDTO boardRequestDTO) {
+    public ResponseEntity postBoard(@Valid @RequestBody BoardRequestDTO boardRequestDTO) {
 
         Long id = boardService.register(boardRequestDTO);
 
@@ -78,7 +78,7 @@ public class BoardController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity putBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id, @RequestBody BoardRequestDTO boardRequestDTO) {
+    public ResponseEntity putBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id, @Valid @RequestBody BoardRequestDTO boardRequestDTO) {
 
         Board board = boardService.modify(request, id, boardRequestDTO);
 
