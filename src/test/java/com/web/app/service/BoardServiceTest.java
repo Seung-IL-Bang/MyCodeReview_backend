@@ -2,15 +2,28 @@ package com.web.app.service;
 
 import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardRequestDTO;
-import jakarta.servlet.http.HttpServletRequest;
+import com.web.app.dto.BoardResponseDTO;
+import com.web.app.fixture.BoardFixtureFactory;
+import com.web.app.repository.BoardRepository;
+import com.web.app.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ActiveProfiles("test")
 @SpringBootTest
 @Log4j2
 public class BoardServiceTest {
@@ -18,66 +31,115 @@ public class BoardServiceTest {
     @Autowired
     private BoardService boardService;
 
+    @Autowired
+    private BoardRepository boardRepository;
+
+    @Autowired
+    private JWTUtil jwtUtil;
+
+    @AfterEach
+    void tearDown() {
+        boardRepository.deleteAllInBatch();
+    }
+
     @Test
-    @DisplayName("Register Board")
+    @DisplayName("사용자가 입력한 데이터로 게시글을 작성한다.")
     public void testRegister() {
+        // given
+        BoardRequestDTO requestDTO = BoardFixtureFactory.createRequestDTO();
 
-        BoardRequestDTO boardRequestDTO = BoardRequestDTO.builder()
-                .title("board title")
-                .content("board content")
-                .writer("방승일")
-                .email("test@gmail.com")
-                .build();
+        // when
+        Long id = boardService.register(requestDTO);
 
-        Long id = boardService.register(boardRequestDTO);
-
-        log.info(id);
+        // then
+        assertThat(id).isNotNull();
     }
 
 
     @Test
-    @DisplayName("Read Board")
+    @DisplayName("게시글 Id로 해당 게시글을 조회한다.")
     public void testRead() {
+        // given
+        Board board = BoardFixtureFactory.create();
 
-        Long id = 1L;
+        Long id = boardRepository.save(board).getId();
 
-        BoardRequestDTO read = boardService.read(id);
+        // when
+        BoardResponseDTO read = boardService.read(id);
 
-        log.info("board: " + read);
+        // then
+        assertThat(read.getId()).isEqualTo(id);
+        assertThat(read.getTitle()).isEqualTo(board.getTitle());
+        assertThat(read.getContent()).isEqualTo(board.getContent());
+        assertThat(read.getWriter()).isEqualTo(board.getWriter());
+        assertThat(read.getEmail()).isEqualTo(board.getEmail());
     }
 
     @Test
-    @DisplayName("Modify Board")
-    public void testModify(HttpServletRequest request) {
-        BoardRequestDTO boardRequestDTO = BoardRequestDTO.builder()
-                .id(1L)
-                .title("updated title")
-                .content("updated content")
-                .email("test@gmail.com")
-                .build();
+    @DisplayName("게시글 수정은 작성자만 가능합니다.")
+    public void testModify() {
+        // given
+        Board board = BoardFixtureFactory.create(1L);
+        Long id = boardRepository.save(board).getId();
 
-        Board board = boardService.modify(request, 1L, boardRequestDTO);
+        BoardRequestDTO updateRequestDTO = BoardFixtureFactory.createRequestDTO();
 
-        log.info("Updated Board : " + board);
+        MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
+
+        // when
+        Board newBoard = boardService.modify(request, id, updateRequestDTO);
+
+        // then
+        assertThat(newBoard.getTitle()).isEqualTo(updateRequestDTO.getTitle());
+        assertThat(newBoard.getContent()).isEqualTo(updateRequestDTO.getContent());
+        assertThat(newBoard.getEmail()).isEqualTo(board.getEmail());
+        assertThat(newBoard.getWriter()).isEqualTo(board.getWriter());
     }
 
-    @Test
-    @DisplayName("Delete Board")
-    public void testDelete(HttpServletRequest request) {
-        Long id = 2L;
 
+    @Test
+    @DisplayName("게시글 삭제는 작성자만 가능합니다.")
+    public void testDelete() {
+        // given
+        Board board = BoardFixtureFactory.create();
+        Long id = boardRepository.save(board).getId();
+
+        MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
+
+        // when
         boardService.remove(request, id);
+
+        // then
+        assertThatThrownBy(() -> boardService.read(id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No value present");
     }
 
     @Test
-    @DisplayName("readAll Board")
+    @DisplayName("회원 본인이 작성한 모든 게시글을 조회합니다.")
     public void testReadAll() {
-        String email = "seungilbang@khu.ac.kr";
+        // given
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
 
-        List<Board> boards = boardService.readAll(email);
+        boardRepository.saveAll(List.of(board1, board2, board3));
 
-        boards.forEach(log::info);
+        // when
+        List<Board> boards = boardService.readAll(board1.getEmail());
+
+        // then
+        assertThat(boards).hasSize(3);
+        assertThat(boards.get(0).getEmail()).isEqualTo(board1.getEmail());
     }
+
+
+    private MockHttpServletRequest getRequestWithJWT(String writer, String email) {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer " + jwtUtil.generateToken(Map.of("email", email, "name", writer), 1));
+        return request;
+    }
+
 
 
 
