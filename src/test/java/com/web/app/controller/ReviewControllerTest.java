@@ -1,6 +1,5 @@
 package com.web.app.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewRequestDTO;
@@ -16,15 +15,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -51,12 +47,14 @@ class ReviewControllerTest {
     @WithMockUser
     void getReview() throws Exception {
         //given
+        Long reviewId = any(Long.class);
+
         ReviewResponseDTO reviewResponseDTO = ReviewFixtureFactory.createResponseDTO();
 
-        given(reviewService.read(any(Long.class))).willReturn(reviewResponseDTO);
+        given(reviewService.read(reviewId)).willReturn(reviewResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/review/%d", reviewResponseDTO.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/review/%d", reviewId))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
