@@ -182,16 +182,22 @@ public class BoardServiceImpl implements BoardService {
 
         Pageable pageable = pageRequestDTO.getPageable("createdAt");
 
-        Page<Board> all = boardRepository.findAll(pageable);
+        Page<Board> boards = boardRepository.searchPublicAll(
+                pageRequestDTO.getTypes(),
+                pageRequestDTO.getKeyword(),
+                pageRequestDTO.getDifficulties(),
+                pageRequestDTO.getTag(),
+                pageable);
 
-        List<BoardResponseDTO> dtoList = all.getContent().stream()
+        List<BoardResponseDTO> dtoList = boards.getContent().stream()
                 .map(board -> modelMapper.map(board, BoardResponseDTO.class))
                 .collect(Collectors.toList());
+
 
         return PageResponseDTO.<BoardResponseDTO>builder()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
-                .total((int) all.getTotalElements())
+                .total((int) boards.getTotalElements())
                 .build();
     }
 }
