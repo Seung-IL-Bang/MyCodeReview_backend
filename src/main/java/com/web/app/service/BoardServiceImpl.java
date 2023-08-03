@@ -176,4 +176,22 @@ public class BoardServiceImpl implements BoardService {
 
         boardRepository.delete(board);
     }
+
+    @Override
+    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPaging(PageRequestDTO pageRequestDTO) {
+
+        Pageable pageable = pageRequestDTO.getPageable("createdAt");
+
+        Page<Board> all = boardRepository.findAll(pageable);
+
+        List<BoardResponseDTO> dtoList = all.getContent().stream()
+                .map(board -> modelMapper.map(board, BoardResponseDTO.class))
+                .collect(Collectors.toList());
+
+        return PageResponseDTO.<BoardResponseDTO>builder()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(dtoList)
+                .total((int) all.getTotalElements())
+                .build();
+    }
 }

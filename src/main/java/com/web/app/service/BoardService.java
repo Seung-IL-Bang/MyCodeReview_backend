@@ -21,4 +21,6 @@ public interface BoardService {
     public Board modify(HttpServletRequest request, Long id, BoardRequestDTO BoardRequestDTO);
 
     public void remove(HttpServletRequest request, Long id);
+
+    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPaging(PageRequestDTO pageRequestDTO);
 }
