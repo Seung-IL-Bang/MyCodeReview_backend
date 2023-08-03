@@ -4,6 +4,7 @@ import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
 import com.web.app.service.ReviewService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,14 +29,14 @@ public class ReviewController {
     }
 
     @PostMapping("/{board-id}")
-    public ResponseEntity postReview(@RequestBody ReviewRequestDTO reviewRequestDTO, @PathVariable("board-id") Long boardId) {
+    public ResponseEntity postReview(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO, @PathVariable("board-id") Long boardId) {
 
         Long registeredId = reviewService.register(modelMapper.map(reviewRequestDTO, Review.class), boardId);
         return new ResponseEntity(registeredId, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity putReview(@RequestBody ReviewRequestDTO reviewRequestDTO, @PathVariable("id") Long id) {
+    public ResponseEntity putReview(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO, @PathVariable("id") Long id) {
 
         reviewService.modify(reviewRequestDTO, id);
 

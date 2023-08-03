@@ -81,6 +81,9 @@ dependencies {
 	// EasyRandom
 	testImplementation 'org.jeasy:easy-random-core:5.0.0'
 
+	// Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 }
 
 tasks.named('test') {
