@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth/board")
 public class BoardController {
 
     private final BoardService boardService;
     private final GetBoardListFromEmailOfJWT getBoardListFromEmailOfJWT;
     private final GetEmailFromJWT getEmailFromJWT;
 
-    @GetMapping("/{id}")
+    @GetMapping("/auth/board/{id}")
     public ResponseEntity getBoard(@PathVariable("id") @Positive Long id) {
 
         BoardResponseDTO response = boardService.read(id);
@@ -33,7 +33,7 @@ public class BoardController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/auth/board/list")
     public ResponseEntity getBoardList(HttpServletRequest request) {
 
         List<Board> boardList = getBoardListFromEmailOfJWT.execute(request);
@@ -41,7 +41,20 @@ public class BoardController {
         return new ResponseEntity(boardList, HttpStatus.OK);
     }
 
-    @GetMapping("/v1/list")
+
+    @GetMapping("/board/list")
+    public ResponseEntity getPublicBoardList(@Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            pageRequestDTO = PageRequestDTO.builder().build();
+        }
+
+        PageResponseDTO<BoardResponseDTO> response = boardService.readPublicAllWithPaging(pageRequestDTO);
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/auth/board/v1/list")
     public ResponseEntity getBoardListWithPaging(@Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -55,7 +68,7 @@ public class BoardController {
         return new ResponseEntity(pageResponseDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/v2/list")
+    @GetMapping("/auth/board/v2/list")
     public ResponseEntity getBoardListWithPagingAndSearch(@Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -69,7 +82,7 @@ public class BoardController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/auth/board")
     public ResponseEntity postBoard(@RequestBody BoardRequestDTO boardRequestDTO) {
 
         Long id = boardService.register(boardRequestDTO);
@@ -77,7 +90,7 @@ public class BoardController {
         return new ResponseEntity(id, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/auth/board/{id}")
     public ResponseEntity putBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id, @RequestBody BoardRequestDTO boardRequestDTO) {
 
         Board board = boardService.modify(request, id, boardRequestDTO);
@@ -85,7 +98,7 @@ public class BoardController {
         return new ResponseEntity(board, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/auth/board/{id}")
     public void deleteBoard(HttpServletRequest request, @PathVariable("id") @Positive Long id) {
         boardService.remove(request, id);
     }
