@@ -3,6 +3,8 @@ package com.web.app.service;
 import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
+import com.web.app.dto.PageRequestDTO;
+import com.web.app.dto.PageResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.repository.BoardRepository;
 import com.web.app.util.JWTUtil;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -133,14 +136,39 @@ public class BoardServiceTest {
         assertThat(boards.get(0).getEmail()).isEqualTo(board1.getEmail());
     }
 
+    @DisplayName("권한 없이도 누구나 페이징 처리된 최신 게시글 목록을 조회 한다.")
+    @Test
+    void readPublicAllWithPaging() {
+        //given
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
+
+        boardRepository.saveAll(List.of(board1, board2, board3));
+
+        PageRequestDTO pageRequestDTO = new PageRequestDTO();
+
+        // when
+        PageResponseDTO<BoardResponseDTO> responseDTO = boardService.readPublicAllWithPaging(pageRequestDTO);
+
+        // then
+        assertThat(responseDTO.getDtoList()).hasSize(3)
+                .extracting("id", "title", "content")
+                .containsExactlyInAnyOrder(
+                        tuple(board1.getId(), board1.getTitle(), board1.getContent()),
+                        tuple(board2.getId(), board2.getTitle(), board2.getContent()),
+                        tuple(board3.getId(), board3.getTitle(), board3.getContent())
+                );
+        assertThat(responseDTO.getPage()).isEqualTo(1);
+        assertThat(responseDTO.getSize()).isEqualTo(8);
+    }
+
 
     private MockHttpServletRequest getRequestWithJWT(String writer, String email) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + jwtUtil.generateToken(Map.of("email", email, "name", writer), 1));
         return request;
     }
-
-
 
 
 }
