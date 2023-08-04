@@ -46,4 +46,18 @@ public class BoardFixtureFactory {
         param.stringLengthRange(3, 10);
         return new EasyRandom(param).nextObject(BoardResponseDTO.class);
     }
+
+    public static Board createById(Long id) {
+        Board board = create();
+        return Board.builder()
+                .id(id)
+                .title(board.getTitle())
+                .content(board.getContent())
+                .email(board.getEmail())
+                .difficulty(board.getDifficulty())
+                .link(board.getLink())
+                .tagList(board.getTagList())
+                .writer(board.getWriter())
+                .build();
+    }
 }
