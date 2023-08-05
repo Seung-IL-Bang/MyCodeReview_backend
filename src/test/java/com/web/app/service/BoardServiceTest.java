@@ -7,15 +7,14 @@ import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.LikesRepository;
 import com.web.app.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -40,8 +39,12 @@ public class BoardServiceTest {
     @Autowired
     private JWTUtil jwtUtil;
 
+    @Autowired
+    private LikesRepository likesRepository;
+
     @AfterEach
     void tearDown() {
+        likesRepository.deleteAllInBatch(); // 외래키 참조 제약 위배 방지를 위한 cleaning
         boardRepository.deleteAllInBatch();
     }
 
