@@ -1,7 +1,9 @@
 package com.web.app.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.app.dto.LikeRequestDTO;
+import com.web.app.exception.BusinessLogicException;
 import com.web.app.service.LikesService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,29 @@ class LikesControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string(String.format(
                         "Liked %d board", boardId
                 )));
+    }
+    
+    @DisplayName("로그인한 유저는 좋아요를 취소할 수 있다.")
+    @Test
+    @WithMockUser
+    void cancelLikeByUser() throws Exception {
+        // given
+        Long boardId = 1L;
+        LikeRequestDTO likeRequestDTO = new LikeRequestDTO(boardId, "test@gmail.com");
+
+        willDoNothing().given(likesService).deleteLike(any(LikeRequestDTO.class));
+        
+        // when // then
+        mockMvc.perform(MockMvcRequestBuilders.delete("/auth/like")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(likeRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(String.format(
+                        "Deleted %d board's Like", boardId
+                )));
+
     }
 
 
