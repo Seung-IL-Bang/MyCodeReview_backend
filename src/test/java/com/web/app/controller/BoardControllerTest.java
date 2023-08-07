@@ -9,20 +9,23 @@ import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.mediator.GetBoardListFromEmailOfJWT;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.service.BoardService;
+import com.web.app.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,14 +55,14 @@ class BoardControllerTest {
     @WithMockUser
     void getBoard() throws Exception {
         //given
-        Long boardId = any(Long.class);
-
         BoardResponseDTO boardResponseDTO = BoardFixtureFactory.createResponseDTO();
 
-        given(boardService.read(boardId)).willReturn(boardResponseDTO);
+        given(getEmailFromJWT.execute(any(HttpServletRequest.class))).willReturn("test@gmail.com");
+
+        given(boardService.read(anyLong(), anyString())).willReturn(boardResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/%d", boardId))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/%d", anyLong()))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())

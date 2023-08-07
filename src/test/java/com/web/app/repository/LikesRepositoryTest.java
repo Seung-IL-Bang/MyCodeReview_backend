@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -81,6 +82,31 @@ class LikesRepositoryTest {
         assertThatThrownBy(() -> likesRepository.findById(liked.getId()).orElseThrow())
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No value present");
+    }
+
+    @DisplayName("특정 회원이 특정 게시글에 좋아요 여부를 알 수 있다.")
+    @Test
+    void isLiked() {
+        // given
+        Member savedMember1 = memberRepository.save(MemberFixtureFactory.create(1L));
+        Member savedMember2 = memberRepository.save(MemberFixtureFactory.create(2L));
+        Board savedBoard = boardRepository.save(BoardFixtureFactory.create(3L));
+
+        Likes likes = Likes.builder()
+                .member(savedMember1)
+                .board(savedBoard)
+                .build();
+
+        likesRepository.save(likes);
+
+        // when
+        List<Long> isLiked1 = likesRepository.isLiked(savedBoard.getId(), savedMember1.getEmail());
+        List<Long> isLiked2 = likesRepository.isLiked(savedBoard.getId(), savedMember2.getEmail());
+
+
+        // then
+        assertThat(isLiked1).hasSize(1);
+        assertThat(isLiked2).hasSize(0);
     }
 
 }

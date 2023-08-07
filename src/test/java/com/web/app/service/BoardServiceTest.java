@@ -1,11 +1,13 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.member.Member;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
+import com.web.app.fixture.MemberFixtureFactory;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.LikesRepository;
 import com.web.app.util.JWTUtil;
@@ -67,11 +69,12 @@ public class BoardServiceTest {
     public void testRead() {
         // given
         Board board = BoardFixtureFactory.create();
+        Member member = MemberFixtureFactory.create();
 
         Long id = boardRepository.save(board).getId();
 
         // when
-        BoardResponseDTO read = boardService.read(id);
+        BoardResponseDTO read = boardService.read(id, member.getEmail());
 
         // then
         assertThat(read.getId()).isEqualTo(id);
@@ -108,6 +111,7 @@ public class BoardServiceTest {
     public void testDelete() {
         // given
         Board board = BoardFixtureFactory.create();
+        Member member = MemberFixtureFactory.create();
         Long id = boardRepository.save(board).getId();
 
         MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
@@ -116,7 +120,7 @@ public class BoardServiceTest {
         boardService.remove(request, id);
 
         // then
-        assertThatThrownBy(() -> boardService.read(id))
+        assertThatThrownBy(() -> boardService.read(id, member.getEmail()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No value present");
     }

@@ -13,6 +13,7 @@ public class BoardFixtureFactory {
         EasyRandomParameters param = new EasyRandomParameters();
         param.stringLengthRange(3, 10);
         param.excludeField(FieldPredicates.named("id"));
+        param.excludeField(FieldPredicates.named("likeCount"));
         return new EasyRandom(param).nextObject(Board.class);
     }
 
@@ -20,6 +21,7 @@ public class BoardFixtureFactory {
         EasyRandomParameters param = new EasyRandomParameters().seed(seed);
         param.stringLengthRange(3, 10);
         param.excludeField(FieldPredicates.named("id"));
+        param.excludeField(FieldPredicates.named("likeCount"));
         return new EasyRandom(param).nextObject(Board.class);
     }
 
@@ -58,7 +60,7 @@ public class BoardFixtureFactory {
                 .link(board.getLink())
                 .tagList(board.getTagList())
                 .writer(board.getWriter())
-                .likeCount(0L)
+                .likeCount(0)
                 .version(0)
                 .build();
     }
