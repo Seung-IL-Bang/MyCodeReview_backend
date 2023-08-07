@@ -147,7 +147,7 @@ public class BoardServiceTest {
         Board board2 = BoardFixtureFactory.create();
         Board board3 = BoardFixtureFactory.create();
 
-        boardRepository.saveAll(List.of(board1, board2, board3));
+        List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3));
 
         PageRequestDTO pageRequestDTO = new PageRequestDTO();
 
@@ -158,9 +158,9 @@ public class BoardServiceTest {
         assertThat(responseDTO.getDtoList()).hasSize(3)
                 .extracting("id", "title", "content")
                 .containsExactlyInAnyOrder(
-                        tuple(board1.getId(), board1.getTitle(), board1.getContent()),
-                        tuple(board2.getId(), board2.getTitle(), board2.getContent()),
-                        tuple(board3.getId(), board3.getTitle(), board3.getContent())
+                        tuple(boards.get(0).getId(), board1.getTitle(), board1.getContent()),
+                        tuple(boards.get(1).getId(), board2.getTitle(), board2.getContent()),
+                        tuple(boards.get(2).getId(), board3.getTitle(), board3.getContent())
                 );
         assertThat(responseDTO.getPage()).isEqualTo(1);
         assertThat(responseDTO.getSize()).isEqualTo(8);

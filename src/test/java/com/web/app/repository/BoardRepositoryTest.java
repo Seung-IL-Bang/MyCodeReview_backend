@@ -41,7 +41,7 @@ class BoardRepositoryTest {
         Board board9 = BoardFixtureFactory.create();
         Board board10 = BoardFixtureFactory.create();
 
-        boardRepository.saveAll(List.of(board1, board2, board3, board4, board5, board6, board7, board8, board9, board10));
+        List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3, board4, board5, board6, board7, board8, board9, board10));
 
         PageRequestDTO pageRequestDTO = new PageRequestDTO(); // 1 page & 8 size
 
@@ -51,21 +51,21 @@ class BoardRepositoryTest {
         Page<Board> all = boardRepository.findAll(pageable);
 
         // then
-        List<Board> boards = all.getContent();
-        assertThat(boards).hasSize(8)
+        List<Board> pagingBoards = all.getContent();
+        assertThat(pagingBoards).hasSize(8)
                 .extracting("id", "title", "content")
                 .containsExactlyInAnyOrder(
-                        tuple(board10.getId(), board10.getTitle(), board10.getContent()),
-                        tuple(board9.getId(), board9.getTitle(), board9.getContent()),
-                        tuple(board8.getId(), board8.getTitle(), board8.getContent()),
-                        tuple(board7.getId(), board7.getTitle(), board7.getContent()),
-                        tuple(board6.getId(), board6.getTitle(), board6.getContent()),
-                        tuple(board5.getId(), board5.getTitle(), board5.getContent()),
-                        tuple(board4.getId(), board4.getTitle(), board4.getContent()),
-                        tuple(board3.getId(), board3.getTitle(), board3.getContent())
+                        tuple(boards.get(9).getId(), board10.getTitle(), board10.getContent()),
+                        tuple(boards.get(8).getId(), board9.getTitle(), board9.getContent()),
+                        tuple(boards.get(7).getId(), board8.getTitle(), board8.getContent()),
+                        tuple(boards.get(6).getId(), board7.getTitle(), board7.getContent()),
+                        tuple(boards.get(5).getId(), board6.getTitle(), board6.getContent()),
+                        tuple(boards.get(4).getId(), board5.getTitle(), board5.getContent()),
+                        tuple(boards.get(3).getId(), board4.getTitle(), board4.getContent()),
+                        tuple(boards.get(2).getId(), board3.getTitle(), board3.getContent())
                 ).doesNotContain(
-                        tuple(board2.getId(), board2.getTitle(), board2.getContent()),
-                        tuple(board1.getId(), board1.getTitle(), board1.getContent())
+                        tuple(boards.get(1).getId(), board2.getTitle(), board2.getContent()),
+                        tuple(boards.get(0).getId(), board1.getTitle(), board1.getContent())
                 );
     }
 

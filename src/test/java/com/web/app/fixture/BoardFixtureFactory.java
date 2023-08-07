@@ -58,6 +58,8 @@ public class BoardFixtureFactory {
                 .link(board.getLink())
                 .tagList(board.getTagList())
                 .writer(board.getWriter())
+                .likeCount(0L)
+                .version(0)
                 .build();
     }
 }
