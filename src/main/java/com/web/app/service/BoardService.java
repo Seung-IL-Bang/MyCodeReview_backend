@@ -10,7 +10,7 @@ public interface BoardService {
 
     public Long register(BoardRequestDTO BoardRequestDTO);
 
-    public BoardResponseDTO read(Long id);
+    public BoardResponseDTO read(Long id, String requestEmail);
 
     public List<Board> readAll(String email);
 

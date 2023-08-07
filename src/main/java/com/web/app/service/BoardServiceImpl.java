@@ -5,6 +5,7 @@ import com.web.app.domain.review.Review;
 import com.web.app.dto.*;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.LikesRepository;
 import com.web.app.repository.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-
+    private final LikesRepository likesRepository;
     private final ReviewRepository reviewRepository;
     private final ModelMapper modelMapper;
     private final GetEmailFromJWT getEmailFromJWT;
@@ -39,13 +40,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponseDTO read(Long id) {
+    public BoardResponseDTO read(Long id, String requestEmail) {
 
         Optional<Board> result = boardRepository.findById(id);
 
         Board board = result.orElseThrow();
 
         BoardResponseDTO dto = modelMapper.map(board, BoardResponseDTO.class);
+
+        List<Long> liked = likesRepository.isLiked(id, requestEmail);
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(board);
 
@@ -54,6 +57,8 @@ public class BoardServiceImpl implements BoardService {
                 .collect(Collectors.toList());
 
         dto.setReviewList(reviewListDTOS);
+        dto.setLiked(!liked.isEmpty());
+        dto.setLikeCount(board.getLikeCount());
 
         return dto;
     }

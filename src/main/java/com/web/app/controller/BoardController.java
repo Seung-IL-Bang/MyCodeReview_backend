@@ -25,9 +25,11 @@ public class BoardController {
     private final GetEmailFromJWT getEmailFromJWT;
 
     @GetMapping("/auth/board/{id}")
-    public ResponseEntity getBoard(@PathVariable("id") @Positive Long id) {
+    public ResponseEntity getBoard(@PathVariable("id") @Positive Long id, HttpServletRequest request) {
 
-        BoardResponseDTO response = boardService.read(id);
+        String requestEmail = getEmailFromJWT.execute(request);
+
+        BoardResponseDTO response = boardService.read(id, requestEmail);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
