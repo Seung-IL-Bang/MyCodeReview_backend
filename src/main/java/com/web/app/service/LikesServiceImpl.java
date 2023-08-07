@@ -10,6 +10,7 @@ import com.web.app.repository.BoardRepository;
 import com.web.app.repository.LikesRepository;
 import com.web.app.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class LikesServiceImpl implements LikesService{
+public class LikesServiceImpl implements LikesService {
 
     private final LikesRepository likesRepository;
 
@@ -46,6 +47,8 @@ public class LikesServiceImpl implements LikesService{
 
         Likes likes = likeRequestDTO.toEntity(board, member);
 
+
+        board.upLike();
         likesRepository.save(likes);
     }
 
@@ -55,7 +58,7 @@ public class LikesServiceImpl implements LikesService{
         memberRepository.findById(likeRequestDTO.getMemberEmail()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
         });
-        boardRepository.findById(likeRequestDTO.getBoardId()).orElseThrow(() -> {
+        Board board = boardRepository.findById(likeRequestDTO.getBoardId()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 게시글은 존재하지 않습니다.");
         });
 
@@ -65,6 +68,7 @@ public class LikesServiceImpl implements LikesService{
             throw new BusinessLogicException(ExceptionCode.EMPTY_LIKE);
         }
 
+        board.downLike();
         likesRepository.deleteById(liked.get(0));
     }
 
