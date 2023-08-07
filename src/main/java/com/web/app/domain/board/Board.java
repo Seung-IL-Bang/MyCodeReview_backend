@@ -41,9 +41,11 @@ public class Board extends BaseTimeEntity {
     private Set<String> tagList;
 
     @Min(value = 0L)
+    @Builder.Default
     private Long likeCount = 0L;
 
     @Version
+    @Builder.Default
     private Integer version = 0;
 
     public void change(String title, String content, Set<String> tagList, String link, String difficulty) {
