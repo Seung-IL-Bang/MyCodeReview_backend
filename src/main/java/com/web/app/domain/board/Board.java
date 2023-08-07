@@ -40,12 +40,11 @@ public class Board extends BaseTimeEntity {
     @ElementCollection
     private Set<String> tagList;
 
-    @Min(value = 0L)
-    @Builder.Default
-    private Long likeCount = 0L;
+    @Column
+    @Min(value = 0)
+    private int likeCount = 0;
 
     @Version
-    @Builder.Default
     private Integer version = 0;
 
     public void change(String title, String content, Set<String> tagList, String link, String difficulty) {
@@ -58,11 +57,11 @@ public class Board extends BaseTimeEntity {
 
 
     public void upLike() {
-        this.likeCount += 1L;
+        this.likeCount += 1;
     }
 
     public void downLike() {
-        this.likeCount -= 1L;
+        this.likeCount -= 1;
     }
 
 
