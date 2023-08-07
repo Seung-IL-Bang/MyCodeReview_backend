@@ -2,6 +2,7 @@ package com.web.app.domain.board;
 
 import com.web.app.domain.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.Set;
@@ -39,12 +40,27 @@ public class Board extends BaseTimeEntity {
     @ElementCollection
     private Set<String> tagList;
 
+    @Min(value = 0L)
+    private Long likeCount = 0L;
+
+    @Version
+    private Integer version = 0;
+
     public void change(String title, String content, Set<String> tagList, String link, String difficulty) {
         this.title = title;
         this.content = content;
         this.tagList = tagList;
         this.link = link;
         this.difficulty = difficulty;
+    }
+
+
+    public void upLike() {
+        this.likeCount += 1L;
+    }
+
+    public void downLike() {
+        this.likeCount -= 1L;
     }
 
 
