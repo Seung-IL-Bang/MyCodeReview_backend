@@ -5,18 +5,23 @@ import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
+import org.jeasy.random.FieldPredicates;
 
 public class BoardFixtureFactory {
 
     public static Board create() {
         EasyRandomParameters param = new EasyRandomParameters();
         param.stringLengthRange(3, 10);
+        param.excludeField(FieldPredicates.named("id"));
+        param.excludeField(FieldPredicates.named("likeCount"));
         return new EasyRandom(param).nextObject(Board.class);
     }
 
     public static Board create(Long seed) {
         EasyRandomParameters param = new EasyRandomParameters().seed(seed);
         param.stringLengthRange(3, 10);
+        param.excludeField(FieldPredicates.named("id"));
+        param.excludeField(FieldPredicates.named("likeCount"));
         return new EasyRandom(param).nextObject(Board.class);
     }
 
@@ -42,5 +47,21 @@ public class BoardFixtureFactory {
         EasyRandomParameters param = new EasyRandomParameters().seed(seed);
         param.stringLengthRange(3, 10);
         return new EasyRandom(param).nextObject(BoardResponseDTO.class);
+    }
+
+    public static Board createById(Long id) {
+        Board board = create();
+        return Board.builder()
+                .id(id)
+                .title(board.getTitle())
+                .content(board.getContent())
+                .email(board.getEmail())
+                .difficulty(board.getDifficulty())
+                .link(board.getLink())
+                .tagList(board.getTagList())
+                .writer(board.getWriter())
+                .likeCount(0)
+                .version(0)
+                .build();
     }
 }

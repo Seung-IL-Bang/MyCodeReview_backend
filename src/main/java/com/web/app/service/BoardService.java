@@ -10,7 +10,7 @@ public interface BoardService {
 
     public Long register(BoardRequestDTO BoardRequestDTO);
 
-    public BoardResponseDTO read(Long id);
+    public BoardResponseDTO read(Long id, String requestEmail);
 
     public List<Board> readAll(String email);
 
@@ -21,4 +21,8 @@ public interface BoardService {
     public Board modify(HttpServletRequest request, Long id, BoardRequestDTO BoardRequestDTO);
 
     public void remove(HttpServletRequest request, Long id);
+
+    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPaging(PageRequestDTO pageRequestDTO);
+
+    PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(String email, PageRequestDTO pageRequestDTO);
 }

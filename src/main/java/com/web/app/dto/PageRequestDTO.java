@@ -35,7 +35,7 @@ public class PageRequestDTO {
 
 
     public int getSkip() {
-        return (page - 1) * 10;
+        return (page - 1) * 8;
     }
 
     public Pageable getPageable(String... props) {

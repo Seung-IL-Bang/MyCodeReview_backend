@@ -1,14 +1,20 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.likes.Likes;
+import com.web.app.domain.member.Member;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
+import com.web.app.dto.PageRequestDTO;
+import com.web.app.dto.PageResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
+import com.web.app.fixture.MemberFixtureFactory;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.LikesRepository;
+import com.web.app.repository.MemberRepository;
 import com.web.app.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +43,17 @@ public class BoardServiceTest {
     @Autowired
     private JWTUtil jwtUtil;
 
+    @Autowired
+    private LikesRepository likesRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
     @AfterEach
     void tearDown() {
+        likesRepository.deleteAllInBatch(); // 외래키 참조 제약 위배 방지를 위한 cleaning
         boardRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
@@ -61,11 +75,12 @@ public class BoardServiceTest {
     public void testRead() {
         // given
         Board board = BoardFixtureFactory.create();
+        Member member = MemberFixtureFactory.create();
 
         Long id = boardRepository.save(board).getId();
 
         // when
-        BoardResponseDTO read = boardService.read(id);
+        BoardResponseDTO read = boardService.read(id, member.getEmail());
 
         // then
         assertThat(read.getId()).isEqualTo(id);
@@ -102,6 +117,7 @@ public class BoardServiceTest {
     public void testDelete() {
         // given
         Board board = BoardFixtureFactory.create();
+        Member member = MemberFixtureFactory.create();
         Long id = boardRepository.save(board).getId();
 
         MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
@@ -110,7 +126,7 @@ public class BoardServiceTest {
         boardService.remove(request, id);
 
         // then
-        assertThatThrownBy(() -> boardService.read(id))
+        assertThatThrownBy(() -> boardService.read(id, member.getEmail()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No value present");
     }
@@ -133,14 +149,68 @@ public class BoardServiceTest {
         assertThat(boards.get(0).getEmail()).isEqualTo(board1.getEmail());
     }
 
+    @DisplayName("권한 없이도 누구나 페이징 처리된 최신 게시글 목록을 조회 한다.")
+    @Test
+    void readPublicAllWithPaging() {
+        //given
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
+
+        List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3));
+
+        PageRequestDTO pageRequestDTO = new PageRequestDTO();
+
+        // when
+        PageResponseDTO<BoardResponseDTO> responseDTO = boardService.readPublicAllWithPaging(pageRequestDTO);
+
+        // then
+        assertThat(responseDTO.getDtoList()).hasSize(3)
+                .extracting("id", "title", "content")
+                .containsExactlyInAnyOrder(
+                        tuple(boards.get(0).getId(), board1.getTitle(), board1.getContent()),
+                        tuple(boards.get(1).getId(), board2.getTitle(), board2.getContent()),
+                        tuple(boards.get(2).getId(), board3.getTitle(), board3.getContent())
+                );
+        assertThat(responseDTO.getPage()).isEqualTo(1);
+        assertThat(responseDTO.getSize()).isEqualTo(8);
+    }
+
+    @DisplayName("로그인한 유저의 좋아요 목록에 해당하는 게시글 목록을 페이징 처리하여 조회할 수 있다.")
+    @Test
+    void readByEmailLikeBoardsWithPaging() {
+        // given
+        Member member = MemberFixtureFactory.create();
+        memberRepository.save(member);
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
+        List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3));
+
+        Likes likes1 = Likes.builder().board(boards.get(0)).member(member).build();
+        Likes likes2 = Likes.builder().board(boards.get(1)).member(member).build();
+        Likes likes3 = Likes.builder().board(boards.get(2)).member(member).build();
+        likesRepository.saveAll(List.of(likes1, likes2, likes3));
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().build();
+
+        // when
+        PageResponseDTO<BoardResponseDTO> pageResponseDTO = boardService.readByEmailLikeBoardsWithPaging(member.getEmail(), pageRequestDTO);
+
+        // then
+        assertThat(pageResponseDTO.getDtoList()).hasSize(3)
+                .extracting("id")
+                .containsExactlyInAnyOrder(boards.get(0).getId(), boards.get(1).getId(), boards.get(2).getId());
+        assertThat(pageResponseDTO.getPage()).isEqualTo(1);
+        assertThat(pageResponseDTO.getSize()).isEqualTo(8);
+    }
+
 
     private MockHttpServletRequest getRequestWithJWT(String writer, String email) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + jwtUtil.generateToken(Map.of("email", email, "name", writer), 1));
         return request;
     }
-
-
 
 
 }

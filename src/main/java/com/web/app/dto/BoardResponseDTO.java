@@ -22,4 +22,6 @@ public class BoardResponseDTO {
         private String difficulty;
         private String writer;
         private String email;
+        private int likeCount;
+        private boolean isLiked;
 }
