@@ -1,6 +1,7 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.likes.Likes;
 import com.web.app.domain.member.Member;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
@@ -10,6 +11,7 @@ import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.LikesRepository;
+import com.web.app.repository.MemberRepository;
 import com.web.app.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
@@ -44,10 +46,14 @@ public class BoardServiceTest {
     @Autowired
     private LikesRepository likesRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @AfterEach
     void tearDown() {
         likesRepository.deleteAllInBatch(); // 외래키 참조 제약 위배 방지를 위한 cleaning
         boardRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
@@ -168,6 +174,35 @@ public class BoardServiceTest {
                 );
         assertThat(responseDTO.getPage()).isEqualTo(1);
         assertThat(responseDTO.getSize()).isEqualTo(8);
+    }
+
+    @DisplayName("로그인한 유저의 좋아요 목록에 해당하는 게시글 목록을 페이징 처리하여 조회할 수 있다.")
+    @Test
+    void readByEmailLikeBoardsWithPaging() {
+        // given
+        Member member = MemberFixtureFactory.create();
+        memberRepository.save(member);
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
+        List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3));
+
+        Likes likes1 = Likes.builder().board(boards.get(0)).member(member).build();
+        Likes likes2 = Likes.builder().board(boards.get(1)).member(member).build();
+        Likes likes3 = Likes.builder().board(boards.get(2)).member(member).build();
+        likesRepository.saveAll(List.of(likes1, likes2, likes3));
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().build();
+
+        // when
+        PageResponseDTO<BoardResponseDTO> pageResponseDTO = boardService.readByEmailLikeBoardsWithPaging(member.getEmail(), pageRequestDTO);
+
+        // then
+        assertThat(pageResponseDTO.getDtoList()).hasSize(3)
+                .extracting("id")
+                .containsExactlyInAnyOrder(boards.get(0).getId(), boards.get(1).getId(), boards.get(2).getId());
+        assertThat(pageResponseDTO.getPage()).isEqualTo(1);
+        assertThat(pageResponseDTO.getSize()).isEqualTo(8);
     }
 
 
