@@ -23,4 +23,6 @@ public interface BoardService {
     public void remove(HttpServletRequest request, Long id);
 
     public PageResponseDTO<BoardResponseDTO> readPublicAllWithPaging(PageRequestDTO pageRequestDTO);
+
+    PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(String email, PageRequestDTO pageRequestDTO);
 }

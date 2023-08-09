@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch {
 
@@ -24,5 +25,8 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch
 
     // 쿼리 메소드 사용한 페이징 목록 조회 with Pageable
     Page<Board> findByEmailOrderByIdDesc(String email, Pageable pageable);
+
+    @Query(value = "select b.* from board b, likes l where l.member_email = :email and l.board_id = b.id order by l.created_at desc", nativeQuery = true)
+    Page<Board> findFavoriteListByEmail(String email, Pageable pageable);
 
 }

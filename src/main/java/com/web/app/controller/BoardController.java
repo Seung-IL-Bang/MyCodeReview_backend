@@ -83,6 +83,20 @@ public class BoardController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @GetMapping("/auth/board/liked/list")
+    public ResponseEntity getLikedBoards(@Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult, HttpServletRequest request) {
+
+        if (bindingResult.hasErrors()) {
+            pageRequestDTO = PageRequestDTO.builder().build();
+        }
+
+        String email = getEmailFromJWT.execute(request);
+
+        PageResponseDTO<BoardResponseDTO> response = boardService.readByEmailLikeBoardsWithPaging(email, pageRequestDTO);
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
     @PostMapping("/auth/board")
     public ResponseEntity postBoard(@RequestBody BoardRequestDTO boardRequestDTO) {
 

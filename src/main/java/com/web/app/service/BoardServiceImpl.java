@@ -205,4 +205,20 @@ public class BoardServiceImpl implements BoardService {
                 .total((int) boards.getTotalElements())
                 .build();
     }
+
+    @Override
+    public PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(String email, PageRequestDTO pageRequestDTO) {
+
+        Page<Board> favoriteListByEmail = boardRepository.findFavoriteListByEmail(email, pageRequestDTO.getPageable());
+
+        List<BoardResponseDTO> dtoList = favoriteListByEmail.getContent().stream()
+                .map(board -> modelMapper.map(board, BoardResponseDTO.class)).toList();
+
+
+        return PageResponseDTO.<BoardResponseDTO>builder()
+                .dtoList(dtoList)
+                .total((int) favoriteListByEmail.getTotalElements())
+                .pageRequestDTO(pageRequestDTO)
+                .build();
+    }
 }
