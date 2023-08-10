@@ -97,14 +97,14 @@ class BoardRepositoryTest {
         // given
         Member member = MemberFixtureFactory.create();
         memberRepository.save(member);
-        Board board1 = BoardFixtureFactory.createById(1L);
-        Board board2 = BoardFixtureFactory.createById(2L);
-        Board board3 = BoardFixtureFactory.createById(3L);
-        boardRepository.saveAll(List.of(board1, board2, board3));
+        Board board1 = BoardFixtureFactory.create();
+        Board board2 = BoardFixtureFactory.create();
+        Board board3 = BoardFixtureFactory.create();
+        List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3));
 
-        Likes likes1 = Likes.builder().board(board1).member(member).build();
-        Likes likes2 = Likes.builder().board(board2).member(member).build();
-        Likes likes3 = Likes.builder().board(board3).member(member).build();
+        Likes likes1 = Likes.builder().board(boards.get(0)).member(member).build();
+        Likes likes2 = Likes.builder().board(boards.get(1)).member(member).build();
+        Likes likes3 = Likes.builder().board(boards.get(2)).member(member).build();
         likesRepository.saveAll(List.of(likes1, likes2, likes3));
 
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().build();
@@ -115,7 +115,7 @@ class BoardRepositoryTest {
         // then
         assertThat(favoriteListByEmail.getContent()).hasSize(3)
                 .extracting("id")
-                .containsExactlyInAnyOrder(board1.getId(), board2.getId(), board3.getId());
+                .containsExactlyInAnyOrder(boards.get(0).getId(), boards.get(1).getId(), boards.get(2).getId());
         assertThat(favoriteListByEmail.getSize()).isEqualTo(pageRequestDTO.getSize());
     }
 
