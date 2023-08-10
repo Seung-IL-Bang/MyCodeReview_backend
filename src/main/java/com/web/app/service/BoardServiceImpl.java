@@ -1,10 +1,12 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.comment.Comment;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.*;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.CommentRepository;
 import com.web.app.repository.LikesRepository;
 import com.web.app.repository.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,8 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final LikesRepository likesRepository;
     private final ReviewRepository reviewRepository;
+
+    private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
     private final GetEmailFromJWT getEmailFromJWT;
 
@@ -42,15 +46,26 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public BoardResponseDTO read(Long id, String requestEmail) {
 
-        Optional<Board> result = boardRepository.findById(id);
-
-        Board board = result.orElseThrow();
+        Board board = boardRepository.findById(id).orElseThrow(() -> {
+            throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
+        });
 
         BoardResponseDTO dto = modelMapper.map(board, BoardResponseDTO.class);
 
-        List<Long> liked = likesRepository.isLiked(id, requestEmail);
+        List<Long> liked;
+        if (requestEmail.isBlank()) {
+            liked = new ArrayList<>();
+        } else {
+            liked = likesRepository.isLiked(id, requestEmail);
+        }
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(board);
+
+        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(board);
+
+        List<CommentResponseDTO> commentListDTO = comments.stream()
+                .map(comment -> modelMapper.map(comment, CommentResponseDTO.class))
+                .collect(Collectors.toList());
 
         List<ReviewListDTO> reviewListDTOS = reviews.stream()
                 .map(review -> modelMapper.map(review, ReviewListDTO.class))
@@ -59,6 +74,7 @@ public class BoardServiceImpl implements BoardService {
         dto.setReviewList(reviewListDTOS);
         dto.setLiked(!liked.isEmpty());
         dto.setLikeCount(board.getLikeCount());
+        dto.setCommentList(commentListDTO);
 
         return dto;
     }
