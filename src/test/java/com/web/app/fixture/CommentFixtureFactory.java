@@ -3,6 +3,7 @@ package com.web.app.fixture;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
 import com.web.app.domain.member.Member;
+import com.web.app.dto.CommentRequestDTO;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
 import org.jeasy.random.FieldPredicates;
@@ -23,6 +24,17 @@ public class CommentFixtureFactory {
         param.excludeField(FieldPredicates.named("board"));
         param.excludeField(FieldPredicates.named("member"));
         return new EasyRandom(param).nextObject(Comment.class);
+    }
+    public static CommentRequestDTO createRequestDTO() {
+        EasyRandomParameters param = new EasyRandomParameters();
+        param.stringLengthRange(3, 10);
+        return new EasyRandom(param).nextObject(CommentRequestDTO.class);
+    }
+
+    public static CommentRequestDTO createRequestDTO(Long seed) {
+        EasyRandomParameters param = new EasyRandomParameters().seed(seed);
+        param.stringLengthRange(3, 10);
+        return new EasyRandom(param).nextObject(CommentRequestDTO.class);
     }
 
     public static Comment of(Board board, Member member) {
