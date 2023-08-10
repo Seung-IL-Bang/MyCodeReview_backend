@@ -17,6 +17,9 @@ public class GetEmailFromJWT {
 
     public String execute(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
+        if (authorization == null) {
+            return "";
+        }
 
         String accessToken = authorization.substring(7);
 
