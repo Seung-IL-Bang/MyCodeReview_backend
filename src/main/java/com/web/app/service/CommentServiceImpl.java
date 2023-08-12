@@ -37,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public void register(CommentRequestDTO commentRequestDTO) {
+    public Comment register(CommentRequestDTO commentRequestDTO) {
 
         Member member = memberRepository.findById(commentRequestDTO.getMemberEmail()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
@@ -49,7 +49,9 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = commentRequestDTO.toEntity(null, board, member, commentRequestDTO.getContent());
 
-        commentRepository.save(comment);
+        Comment save = commentRepository.save(comment);
+
+        return save;
     }
 
     @Override

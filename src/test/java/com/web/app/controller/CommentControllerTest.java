@@ -1,12 +1,15 @@
 package com.web.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.app.domain.comment.Comment;
 import com.web.app.dto.CommentRequestDTO;
+import com.web.app.dto.CommentResponseDTO;
 import com.web.app.fixture.CommentFixtureFactory;
 import com.web.app.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,6 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,6 +40,9 @@ class CommentControllerTest {
     @MockBean
     private CommentService commentService;
 
+    @MockBean
+    private ModelMapper modelMapper;
+
 
     @DisplayName("로그인한 회원은 게시글에 댓글을 달 수 있다.")
     @Test
@@ -43,7 +50,11 @@ class CommentControllerTest {
     void postComment() throws Exception {
         // given
         CommentRequestDTO requestDTO = CommentFixtureFactory.createRequestDTO();
-        doNothing().when(commentService).register(any(CommentRequestDTO.class));
+        Comment comment = CommentFixtureFactory.create();
+        CommentResponseDTO commentResponseDTO = CommentFixtureFactory.createResponseDTO();
+
+        given(commentService.register(any(CommentRequestDTO.class))).willReturn(comment);
+        given(modelMapper.map(comment, CommentResponseDTO.class)).willReturn(commentResponseDTO);
 
         // when // then
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/comment")
@@ -52,7 +63,8 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().string("Registered Comment!"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(commentResponseDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(commentResponseDTO.getContent()));
     }
 
     @DisplayName("로그인한 회원은 본인이 작성한 게시글의 댓글을 수정할 수 있다.")
