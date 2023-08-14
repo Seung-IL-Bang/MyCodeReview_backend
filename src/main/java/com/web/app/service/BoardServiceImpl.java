@@ -64,7 +64,7 @@ public class BoardServiceImpl implements BoardService {
         List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(board);
 
         List<CommentResponseDTO> commentListDTO = comments.stream()
-                .map(comment -> modelMapper.map(comment, CommentResponseDTO.class))
+                .map(CommentResponseDTO::new)
                 .collect(Collectors.toList());
 
         List<ReviewListDTO> reviewListDTOS = reviews.stream()
