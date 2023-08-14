@@ -25,4 +25,5 @@ public class BoardResponseDTO {
         private String email;
         private int likeCount;
         private boolean isLiked;
+        private boolean myBoard;
 }
