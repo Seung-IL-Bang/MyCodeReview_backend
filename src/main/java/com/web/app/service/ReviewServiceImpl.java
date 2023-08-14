@@ -1,11 +1,14 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.comment.Comment;
 import com.web.app.domain.review.Review;
+import com.web.app.dto.CommentResponseDTO;
 import com.web.app.dto.ReviewListDTO;
 import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.CommentRepository;
 import com.web.app.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,6 +23,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -39,11 +43,19 @@ public class ReviewServiceImpl implements ReviewService {
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(findReview.getBoard());
 
+        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(findReview.getBoard());
+
+        List<CommentResponseDTO> commentListDTO = comments.stream()
+                .map(CommentResponseDTO::new)
+                .collect(Collectors.toList());
+
         List<ReviewListDTO> reviewListDTOS = reviews.stream()
                 .map(review -> modelMapper.map(review, ReviewListDTO.class))
                 .collect(Collectors.toList());
 
         ReviewResponseDTO responseDTO = findReview.toResponseDTO(reviewListDTOS);
+
+        responseDTO.setCommentList(commentListDTO);
 
         return responseDTO;
     }

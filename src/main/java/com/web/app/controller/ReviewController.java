@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth/board/review")
 public class ReviewController {
 
     private final ReviewService reviewService;
     private final ModelMapper modelMapper;
     
-    @GetMapping("/{id}")
+    @GetMapping("/board/review/{id}")
     public ResponseEntity getReview(@PathVariable("id") @Positive Long id) {
 
         ReviewResponseDTO response = reviewService.read(id);
@@ -28,14 +27,14 @@ public class ReviewController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/{board-id}")
+    @PostMapping("/auth/board/review/{board-id}")
     public ResponseEntity postReview(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO, @PathVariable("board-id") Long boardId) {
 
         Long registeredId = reviewService.register(modelMapper.map(reviewRequestDTO, Review.class), boardId);
         return new ResponseEntity(registeredId, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/auth/board/review/{id}")
     public ResponseEntity putReview(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO, @PathVariable("id") Long id) {
 
         reviewService.modify(reviewRequestDTO, id);
@@ -43,7 +42,7 @@ public class ReviewController {
         return new ResponseEntity("Updated Id: " + id + " Review", HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/auth/board/review/{id}")
     public ResponseEntity deleteReview(@PathVariable("id") Long id) {
 
         reviewService.remove(id);
