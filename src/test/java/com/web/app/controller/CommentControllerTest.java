@@ -40,9 +40,6 @@ class CommentControllerTest {
     @MockBean
     private CommentService commentService;
 
-    @MockBean
-    private ModelMapper modelMapper;
-
 
     @DisplayName("로그인한 회원은 게시글에 댓글을 달 수 있다.")
     @Test
@@ -50,11 +47,9 @@ class CommentControllerTest {
     void postComment() throws Exception {
         // given
         CommentRequestDTO requestDTO = CommentFixtureFactory.createRequestDTO();
-        Comment comment = CommentFixtureFactory.create();
-        CommentResponseDTO commentResponseDTO = CommentFixtureFactory.createResponseDTO();
+        CommentResponseDTO responseDTO = CommentFixtureFactory.createResponseDTO();
 
-        given(commentService.register(any(CommentRequestDTO.class))).willReturn(comment);
-        given(modelMapper.map(comment, CommentResponseDTO.class)).willReturn(commentResponseDTO);
+        given(commentService.register(any(CommentRequestDTO.class))).willReturn(responseDTO);
 
         // when // then
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/comment")
@@ -63,8 +58,11 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(commentResponseDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(commentResponseDTO.getContent()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(responseDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(responseDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.memberEmail").value(responseDTO.getMemberEmail()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.memberName").value(responseDTO.getMemberName()));
+
     }
 
     @DisplayName("로그인한 회원은 본인이 작성한 게시글의 댓글을 수정할 수 있다.")

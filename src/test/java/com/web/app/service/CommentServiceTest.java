@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
@@ -62,6 +63,7 @@ class CommentServiceTest {
         // given
         Board board = BoardFixtureFactory.createById(1L);
         Member member = MemberFixtureFactory.create();
+        Comment comment = CommentFixtureFactory.of(board, member);
 
         // why ??? given 은 왜 에러를 던지는지 doReturn 하고 비교
         doReturn(Optional.of(member))
@@ -70,10 +72,14 @@ class CommentServiceTest {
         doReturn(Optional.of(board))
                 .when(boardRepository)
                 .findById(anyLong());
+        doReturn(comment)
+                .when(commentRepository)
+                .save(any(Comment.class));
 
         CommentRequestDTO commentRequestDTO = new CommentRequestDTO(null, "testComment", board.getId(), member.getEmail());
 
         // when // then
+
         assertThatCode(() -> commentService.register(commentRequestDTO))
                 .doesNotThrowAnyException();
         verify(commentRepository, times(1)).save(any(Comment.class));
