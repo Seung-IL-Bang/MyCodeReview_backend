@@ -54,7 +54,7 @@ class ReviewControllerTest {
         given(reviewService.read(reviewId)).willReturn(reviewResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/review/%d", reviewId))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/review/%d", reviewId))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
