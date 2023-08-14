@@ -1,6 +1,5 @@
 package com.web.app.controller;
 
-import com.web.app.domain.comment.Comment;
 import com.web.app.dto.CommentRequestDTO;
 import com.web.app.dto.CommentResponseDTO;
 import com.web.app.exception.BusinessLogicException;
@@ -9,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
-    private final ModelMapper modelMapper;
 
     @PostMapping("/auth/comment")
     public ResponseEntity postComment(@Valid @RequestBody CommentRequestDTO commentRequestDTO) {
-        Comment comment = commentService.register(commentRequestDTO);
-        CommentResponseDTO response = modelMapper.map(comment, CommentResponseDTO.class);
+        CommentResponseDTO response = commentService.register(commentRequestDTO);
         return new ResponseEntity<>(response , HttpStatus.CREATED);
     }
 

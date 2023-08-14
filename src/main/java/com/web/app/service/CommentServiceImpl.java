@@ -4,6 +4,7 @@ import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
 import com.web.app.domain.member.Member;
 import com.web.app.dto.CommentRequestDTO;
+import com.web.app.dto.CommentResponseDTO;
 import com.web.app.exception.BusinessLogicException;
 import com.web.app.exception.ExceptionCode;
 import com.web.app.mediator.GetEmailFromJWT;
@@ -37,7 +38,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public Comment register(CommentRequestDTO commentRequestDTO) {
+    public CommentResponseDTO register(CommentRequestDTO commentRequestDTO) {
 
         Member member = memberRepository.findById(commentRequestDTO.getMemberEmail()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
@@ -51,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment save = commentRepository.save(comment);
 
-        return save;
+        return new CommentResponseDTO(save);
     }
 
     @Override
