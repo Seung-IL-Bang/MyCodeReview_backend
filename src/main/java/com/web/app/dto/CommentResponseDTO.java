@@ -16,6 +16,7 @@ public class CommentResponseDTO {
     private String content;
     private String memberEmail;
     private String memberName;
+    private boolean myComment;
     private LocalDateTime modifiedAt;
 
     public CommentResponseDTO(Comment comment) {
@@ -24,6 +25,20 @@ public class CommentResponseDTO {
         this.memberName = comment.getMember().getName();
         this.memberEmail = comment.getMember().getEmail();
         this.modifiedAt = comment.getModifiedAt();
+    }
+
+    public CommentResponseDTO(Comment comment, String requestEmail) {
+        this.id = comment.getId();
+        this.content = comment.getContent();
+        this.memberName = comment.getMember().getName();
+        this.memberEmail = comment.getMember().getEmail();
+        this.modifiedAt = comment.getModifiedAt();
+
+        if (comment.getMember().getEmail().equals(requestEmail)) {
+            this.myComment = true;
+        } else {
+            this.myComment = false;
+        }
     }
 
 }
