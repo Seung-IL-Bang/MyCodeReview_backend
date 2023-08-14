@@ -6,17 +6,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch {
 
     @Query("select b from Board b where b.email = :email")
-    List<Board> findListAll(String email);
+    List<Board> findListAll(@Param("email") String email);
 
     @Query("select count(b.id) from Board b where b.email = :email")
-    int getCount(String email);
+    int getCount(@Param("email") String email);
 
     // ** Deprecated **
     // nativeQuery 사용한 페이징 목록 조회
@@ -29,5 +29,5 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch
     @Query(value = "select b.* from board b, likes l where l.member_email = :email and l.board_id = b.id order by l.created_at desc",
             countQuery = "select count(b.id) from board b, likes l where l.member_email = :email and l.board_id = b.id",
             nativeQuery = true)
-    Page<Board> findFavoriteListByEmail(String email, Pageable pageable);
+    Page<Board> findFavoriteListByEmail(@Param("email") String email, Pageable pageable);
 }
