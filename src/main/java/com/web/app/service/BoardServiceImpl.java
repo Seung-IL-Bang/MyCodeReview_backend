@@ -64,12 +64,19 @@ public class BoardServiceImpl implements BoardService {
         List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(board);
 
         List<CommentResponseDTO> commentListDTO = comments.stream()
-                .map(CommentResponseDTO::new)
+                .map(comment -> new CommentResponseDTO(comment, requestEmail))
                 .collect(Collectors.toList());
+
 
         List<ReviewListDTO> reviewListDTOS = reviews.stream()
                 .map(review -> modelMapper.map(review, ReviewListDTO.class))
                 .collect(Collectors.toList());
+
+        if (!board.getEmail().equals(requestEmail) || requestEmail.isBlank()) {
+            dto.setMyBoard(false);
+        } else {
+            dto.setMyBoard(true);
+        }
 
         dto.setReviewList(reviewListDTOS);
         dto.setLiked(!liked.isEmpty());
@@ -171,7 +178,7 @@ public class BoardServiceImpl implements BoardService {
 
         String email = getEmailFromJWT.execute(request);
 
-        if (!board.getEmail().equals(email)) {
+        if (!board.getEmail().equals(email) || email.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
@@ -188,7 +195,7 @@ public class BoardServiceImpl implements BoardService {
 
         String email = getEmailFromJWT.execute(request);
 
-        if (!board.getEmail().equals(email)) {
+        if (!board.getEmail().equals(email) || email.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
