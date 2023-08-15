@@ -9,14 +9,14 @@ import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.mediator.GetBoardListFromEmailOfJWT;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.service.BoardService;
-import com.web.app.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -50,19 +50,20 @@ class BoardControllerTest {
     private GetEmailFromJWT getEmailFromJWT;
 
 
-    @DisplayName("Board Id 에 해당하는 게시글을 조회합니다.")
-    @Test
+    @DisplayName("로그인 또는 비로그인 유저가 Board Id 에 해당하는 게시글을 조회합니다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"test@gmail.com", ""})
     @WithMockUser
-    void getBoard() throws Exception {
+    void getBoard(String requestEmail) throws Exception {
         //given
         BoardResponseDTO boardResponseDTO = BoardFixtureFactory.createResponseDTO();
 
-        given(getEmailFromJWT.execute(any(HttpServletRequest.class))).willReturn("test@gmail.com");
+        given(getEmailFromJWT.execute(any(HttpServletRequest.class))).willReturn(requestEmail);
 
         given(boardService.read(anyLong(), anyString())).willReturn(boardResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/%d", anyLong()))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/%d", anyLong()))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -74,7 +75,8 @@ class BoardControllerTest {
                 .andExpect(jsonPath("$.difficulty").value(boardResponseDTO.getDifficulty()))
                 .andExpect(jsonPath("$.writer").value(boardResponseDTO.getWriter()))
                 .andExpect(jsonPath("$.email").value(boardResponseDTO.getEmail()))
-                .andExpect(jsonPath("$.reviewList").isArray());
+                .andExpect(jsonPath("$.reviewList").isArray())
+                .andExpect(jsonPath("$.commentList").isArray());
     }
 
     @DisplayName("유저의 이메일을 통해 해당 유저가 작성한 모든 게시글들을 조회한다.")

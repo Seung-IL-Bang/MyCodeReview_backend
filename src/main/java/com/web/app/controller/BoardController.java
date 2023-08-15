@@ -24,7 +24,7 @@ public class BoardController {
     private final GetBoardListFromEmailOfJWT getBoardListFromEmailOfJWT;
     private final GetEmailFromJWT getEmailFromJWT;
 
-    @GetMapping("/auth/board/{id}")
+    @GetMapping("/board/{id}")
     public ResponseEntity getBoard(@PathVariable("id") @Positive Long id, HttpServletRequest request) {
 
         String requestEmail = getEmailFromJWT.execute(request);

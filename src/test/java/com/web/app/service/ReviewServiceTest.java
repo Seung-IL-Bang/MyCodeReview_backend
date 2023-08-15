@@ -6,16 +6,20 @@ import com.web.app.dto.ReviewResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.ReviewRepository;
-import org.junit.jupiter.api.Disabled;
+import com.web.app.util.JWTUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ActiveProfiles("test")
 @Transactional(readOnly = true)
@@ -29,6 +33,9 @@ class ReviewServiceTest {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @Autowired
+    private JWTUtil jwtUtil;
 
     @DisplayName("서브 리뷰 ID 를 통해 해당 서브 리뷰를 조회 한다.")
     @Test
@@ -44,12 +51,20 @@ class ReviewServiceTest {
                 .build();
         Review savedReview = reviewRepository.save(review);
 
+        MockHttpServletRequest requestWithJWT = getRequestWithJWT(board.getWriter(), board.getEmail());
+
         // when
-        ReviewResponseDTO read = reviewService.read(savedReview.getId());
+        ReviewResponseDTO read = reviewService.read(savedReview.getId(), requestWithJWT);
 
         // then
         assertThat(read.getContent()).isEqualTo(review.getContent());
         assertThat(read.getSubTitle()).isEqualTo(review.getSubTitle());
 
+    }
+
+    private MockHttpServletRequest getRequestWithJWT(String writer, String email) {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer " + jwtUtil.generateToken(Map.of("email", email, "name", writer), 1));
+        return request;
     }
 }

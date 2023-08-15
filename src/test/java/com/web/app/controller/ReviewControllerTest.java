@@ -6,6 +6,7 @@ import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
 import com.web.app.fixture.ReviewFixtureFactory;
 import com.web.app.service.ReviewService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -51,10 +52,10 @@ class ReviewControllerTest {
 
         ReviewResponseDTO reviewResponseDTO = ReviewFixtureFactory.createResponseDTO();
 
-        given(reviewService.read(reviewId)).willReturn(reviewResponseDTO);
+        given(reviewService.read(reviewId, any(HttpServletRequest.class))).willReturn(reviewResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/auth/board/review/%d", reviewId))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/review/%d", reviewId))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -71,7 +72,7 @@ class ReviewControllerTest {
         // given
         ReviewRequestDTO reviewRequestDTO = ReviewFixtureFactory.createRequestDTO();
 
-        given(reviewService.register(any(Review.class), any(Long.class)))
+        given(reviewService.register(any(HttpServletRequest.class) ,any(Review.class), any(Long.class)))
                 .willReturn(any(Long.class));
 
 
@@ -92,7 +93,7 @@ class ReviewControllerTest {
         Long reviewId = any(Long.class);
         ReviewRequestDTO reviewRequestDTO = ReviewFixtureFactory.createRequestDTO();
 
-        given(reviewService.modify(any(ReviewRequestDTO.class), reviewId))
+        given(reviewService.modify(any(HttpServletRequest.class), any(ReviewRequestDTO.class), reviewId))
                 .willReturn(null);
 
         // when // then
@@ -110,7 +111,7 @@ class ReviewControllerTest {
     @WithMockUser
     void deleteReview() throws Exception {
         // given
-        willDoNothing().given(reviewService).remove(any(Long.class));
+        willDoNothing().given(reviewService).remove(any(HttpServletRequest.class), any(Long.class));
 
         // when // then
         mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/auth/board/review/%d", 1L))

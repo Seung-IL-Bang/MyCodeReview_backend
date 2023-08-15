@@ -18,10 +18,12 @@ public class BoardResponseDTO {
         private String content;
         private Set<String> tagList;
         private List<ReviewListDTO> reviewList;
+        private List<CommentResponseDTO> commentList;
         private String link;
         private String difficulty;
         private String writer;
         private String email;
         private int likeCount;
         private boolean isLiked;
+        private boolean myBoard;
 }

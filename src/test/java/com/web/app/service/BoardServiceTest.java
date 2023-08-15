@@ -10,6 +10,7 @@ import com.web.app.dto.PageResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.CommentRepository;
 import com.web.app.repository.LikesRepository;
 import com.web.app.repository.MemberRepository;
 import com.web.app.util.JWTUtil;
@@ -49,8 +50,12 @@ public class BoardServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
     @AfterEach
     void tearDown() {
+        commentRepository.deleteAllInBatch(); // 외래키 참조 제약 위배 방지를 위한 cleaning
         likesRepository.deleteAllInBatch(); // 외래키 참조 제약 위배 방지를 위한 cleaning
         boardRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
@@ -128,7 +133,7 @@ public class BoardServiceTest {
         // then
         assertThatThrownBy(() -> boardService.read(id, member.getEmail()))
                 .isInstanceOf(NoSuchElementException.class)
-                .hasMessage("No value present");
+                .hasMessage("해당 회원은 존재하지 않습니다.");
     }
 
     @Test
