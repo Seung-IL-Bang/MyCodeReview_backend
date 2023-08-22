@@ -30,4 +30,8 @@ public class Reply extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "comment_id")
     private Comment comment;
+
+    public void modify(String content) {
+        this.content = content;
+    }
 }
