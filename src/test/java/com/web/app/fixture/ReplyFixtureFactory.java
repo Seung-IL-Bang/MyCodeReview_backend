@@ -4,6 +4,9 @@ import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
 import com.web.app.domain.member.Member;
 import com.web.app.domain.reply.Reply;
+import com.web.app.dto.CommentRequestDTO;
+import com.web.app.dto.ReplyRequestDTO;
+import com.web.app.dto.ReplyResponseDTO;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
 import org.jeasy.random.FieldPredicates;
@@ -42,5 +45,17 @@ public class ReplyFixtureFactory {
                 .comment(comment)
                 .content(reply.getContent())
                 .build();
+    }
+
+    public static ReplyRequestDTO createRequestDTO() {
+        EasyRandomParameters param = new EasyRandomParameters();
+        param.stringLengthRange(3, 10);
+        return new EasyRandom(param).nextObject(ReplyRequestDTO.class);
+    }
+
+    public static ReplyResponseDTO createResponseDTO() {
+        EasyRandomParameters param = new EasyRandomParameters();
+        param.stringLengthRange(3, 10);
+        return new EasyRandom(param).nextObject(ReplyResponseDTO.class);
     }
 }
