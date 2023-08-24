@@ -1,6 +1,7 @@
 package com.web.app.fixture;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.member.Member;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
 import org.jeasy.random.EasyRandom;
@@ -60,6 +61,21 @@ public class BoardFixtureFactory {
                 .link(board.getLink())
                 .tagList(board.getTagList())
                 .writer(board.getWriter())
+                .likeCount(0)
+                .version(0)
+                .build();
+    }
+
+    public static Board of(Member member) {
+        Board board = create();
+        return Board.builder()
+                .title(board.getTitle())
+                .content(board.getContent())
+                .email(member.getEmail())
+                .difficulty(board.getDifficulty())
+                .link(board.getLink())
+                .tagList(board.getTagList())
+                .writer(member.getName())
                 .likeCount(0)
                 .version(0)
                 .build();
