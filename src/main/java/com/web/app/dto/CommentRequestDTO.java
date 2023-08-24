@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentRequestDTO {
 
-    private Long id;
+    private Long id; // 수정 요청시 사용
     private String content;
     private Long boardId;
 
