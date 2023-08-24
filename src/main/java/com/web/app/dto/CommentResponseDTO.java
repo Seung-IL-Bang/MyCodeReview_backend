@@ -4,6 +4,7 @@ import com.web.app.domain.comment.Comment;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +17,8 @@ public class CommentResponseDTO {
     private String content;
     private String memberEmail;
     private String memberName;
+    private int repliesCount;
+    private List<ReplyResponseDTO> replies;
     private boolean myComment;
     private LocalDateTime modifiedAt;
 
