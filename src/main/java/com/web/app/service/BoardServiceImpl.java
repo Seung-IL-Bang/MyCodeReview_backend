@@ -2,13 +2,11 @@ package com.web.app.service;
 
 import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
+import com.web.app.domain.reply.Reply;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.*;
 import com.web.app.mediator.GetEmailFromJWT;
-import com.web.app.repository.BoardRepository;
-import com.web.app.repository.CommentRepository;
-import com.web.app.repository.LikesRepository;
-import com.web.app.repository.ReviewRepository;
+import com.web.app.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,6 +28,7 @@ public class BoardServiceImpl implements BoardService {
     private final ReviewRepository reviewRepository;
 
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
     private final GetEmailFromJWT getEmailFromJWT;
 
@@ -61,11 +60,22 @@ public class BoardServiceImpl implements BoardService {
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(board);
 
-        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(board);
+        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(board);
 
         List<CommentResponseDTO> commentListDTO = comments.stream()
                 .map(comment -> new CommentResponseDTO(comment, requestEmail))
                 .collect(Collectors.toList());
+
+        commentListDTO.stream()
+                .forEach(commentResponseDTO -> {
+                    Long replyId = commentResponseDTO.getId();
+                    List<Reply> findList = replyRepository.findAllByComment_IdOrderByCreatedAtAsc(replyId);
+                    List<ReplyResponseDTO> replyListDTO = findList.stream().map(reply -> new ReplyResponseDTO(reply, requestEmail))
+                            .collect(Collectors.toList());
+
+                    commentResponseDTO.setRepliesCount(findList.size());
+                    commentResponseDTO.setReplies(replyListDTO);
+                });
 
 
         List<ReviewListDTO> reviewListDTOS = reviews.stream()
@@ -82,6 +92,7 @@ public class BoardServiceImpl implements BoardService {
         dto.setLiked(!liked.isEmpty());
         dto.setLikeCount(board.getLikeCount());
         dto.setCommentList(commentListDTO);
+        dto.setCommentsCount(commentListDTO.size());
 
         return dto;
     }
