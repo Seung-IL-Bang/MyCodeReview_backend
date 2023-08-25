@@ -30,6 +30,7 @@ public class AccessTokenCheckFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         if (!path.startsWith("/auth")) {
+            log.info("=================================== Skip Access Token Check Filter =================================");
             filterChain.doFilter(request, response);
             return;
         }
