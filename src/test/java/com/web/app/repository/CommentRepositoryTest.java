@@ -68,7 +68,7 @@ class CommentRepositoryTest {
         List<Comment> saveAll = commentRepository.saveAll(List.of(comment1, comment2, comment3));
 
         // when
-        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(savedBoard);
+        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(savedBoard);
 
         // then
         assertThat(comments).hasSize(3)

@@ -58,7 +58,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(findReview.getBoard());
 
-        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtDesc(findReview.getBoard());
+        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(findReview.getBoard());
 
         String requestEmail = getEmailFromJWT.execute(request);
 

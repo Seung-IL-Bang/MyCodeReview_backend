@@ -67,4 +67,14 @@ public class CommentFixtureFactory {
                 .content(comment.getContent())
                 .build();
     }
+
+    public static Comment createById(Board board, Member member, Long id) {
+        Comment comment = create();
+        return Comment.builder()
+                .id(id)
+                .member(member)
+                .board(board)
+                .content(comment.getContent())
+                .build();
+    }
 }
