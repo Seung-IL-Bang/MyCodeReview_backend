@@ -1,5 +1,6 @@
 package com.web.app.fixture;
 
+import com.web.app.domain.board.Board;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
@@ -38,6 +39,16 @@ public class ReviewFixtureFactory {
         return new EasyRandom(param).nextObject(ReviewResponseDTO.class);
     }
 
+
+    public static Review of(Board board) {
+        Review review = create();
+        return Review.builder()
+                .id(review.getId())
+                .subTitle(review.getSubTitle())
+                .content(review.getContent())
+                .board(board)
+                .build();
+    }
 
 
 
