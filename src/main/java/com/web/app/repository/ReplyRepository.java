@@ -9,4 +9,6 @@ import java.util.List;
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<Reply> findAllByComment_IdOrderByCreatedAtAsc(Long Id);
+
+    void deleteRepliesByCommentIs(Comment comment);
 }
