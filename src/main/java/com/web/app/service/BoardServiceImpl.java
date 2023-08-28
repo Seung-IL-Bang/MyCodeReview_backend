@@ -26,7 +26,6 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final LikesRepository likesRepository;
     private final ReviewRepository reviewRepository;
-
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
@@ -210,8 +209,13 @@ public class BoardServiceImpl implements BoardService {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
-        // 외래키 제약조건에 의해 Reviews 먼저 삭제
+        // 외래키 제약조건에 의해 Reviews, Likes, Comments, Replies 먼저 삭제
         reviewRepository.deleteReviewsByBoardIs(board);
+        likesRepository.deleteLikesByBoardIs(board);
+        List<Comment> comments = commentRepository.findAllByBoardIs(board);
+        comments.stream().forEach(replyRepository::deleteRepliesByCommentIs);
+        commentRepository.deleteAll(comments);
+
 
         boardRepository.delete(board);
     }
