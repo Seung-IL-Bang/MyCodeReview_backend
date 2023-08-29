@@ -86,6 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         responseDTO.setCommentList(commentListDTO);
+        responseDTO.setCommentsCount(commentListDTO.size());
         responseDTO.setLiked(!liked.isEmpty());
         responseDTO.setLikeCount(findReview.getBoard().getLikeCount());
 
