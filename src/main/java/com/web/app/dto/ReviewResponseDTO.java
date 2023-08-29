@@ -22,6 +22,7 @@ public class ReviewResponseDTO {
     private Set<String> tagList;
     private List<ReviewListDTO> reviewList;
     private List<CommentResponseDTO> commentList;
+    private int commentsCount;
     private String link;
     private String difficulty;
     private String writer;
