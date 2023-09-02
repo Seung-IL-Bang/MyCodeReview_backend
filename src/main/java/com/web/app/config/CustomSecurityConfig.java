@@ -1,6 +1,7 @@
 package com.web.app.config;
 
 import com.web.app.security.filter.AccessTokenCheckFilter;
+import com.web.app.security.filter.RefreshTokenCheckFilter;
 import com.web.app.security.handler.CustomSocialLoginSuccessHandler;
 import com.web.app.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,9 @@ public class CustomSecurityConfig {
         // authentication 전 '/auth/**' 경로에 대해 accessToken 유효성 검증
         http.addFilterBefore(accessTokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
+        // authentication 전 '/refreshPath' 경로에 대해 refreshToken 검사 후 Token 재발급 과정 수행
+        http.addFilterBefore(refreshTokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
         // OAuth2 Login
         http.oauth2Login(req -> req.loginPage("/login").successHandler(authenticationSuccessHandler()));
 
@@ -95,5 +99,9 @@ public class CustomSecurityConfig {
 
     private AccessTokenCheckFilter accessTokenCheckFilter(JWTUtil jwtUtil) {
         return new AccessTokenCheckFilter(jwtUtil);
+    }
+
+    private RefreshTokenCheckFilter refreshTokenCheckFilter(JWTUtil jwtUtil) {
+        return new RefreshTokenCheckFilter(jwtUtil, "/refreshPath");
     }
 }

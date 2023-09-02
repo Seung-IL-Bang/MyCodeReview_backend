@@ -1,18 +1,17 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.comment.Comment;
 import com.web.app.domain.likes.Likes;
 import com.web.app.domain.member.Member;
+import com.web.app.domain.reply.Reply;
+import com.web.app.domain.review.Review;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
-import com.web.app.fixture.BoardFixtureFactory;
-import com.web.app.fixture.MemberFixtureFactory;
-import com.web.app.repository.BoardRepository;
-import com.web.app.repository.CommentRepository;
-import com.web.app.repository.LikesRepository;
-import com.web.app.repository.MemberRepository;
+import com.web.app.fixture.*;
+import com.web.app.repository.*;
 import com.web.app.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
@@ -52,6 +51,13 @@ public class BoardServiceTest {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private ReplyRepository replyRepository;
+
 
     @AfterEach
     void tearDown() {
@@ -126,6 +132,38 @@ public class BoardServiceTest {
         Long id = boardRepository.save(board).getId();
 
         MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
+
+        // when
+        boardService.remove(request, id);
+
+        // then
+        assertThatThrownBy(() -> boardService.read(id, member.getEmail()))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당 회원은 존재하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 시 연관된 모든 하위 엔티티가 삭제됩니다.")
+    public void testDelete2() {
+        // given
+        Board board = BoardFixtureFactory.create();
+        Member member = MemberFixtureFactory.create();
+
+        Member savedMember = memberRepository.save(member);
+        Board savedBoard = boardRepository.save(board);
+
+        Long id = savedBoard.getId();
+        MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
+
+        // 연관된 하위 엔티티
+        Review review = ReviewFixtureFactory.of(savedBoard);
+        Likes likes = new Likes(null, savedBoard, savedMember);
+        Comment comment = CommentFixtureFactory.of(savedBoard, savedMember);
+        Comment savedComment = commentRepository.save(comment);
+        Reply reply = ReplyFixtureFactory.of(savedComment, savedMember);
+        reviewRepository.save(review);
+        likesRepository.save(likes);
+        replyRepository.save(reply);
 
         // when
         boardService.remove(request, id);
