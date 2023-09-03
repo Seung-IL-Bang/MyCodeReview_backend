@@ -1,0 +1,28 @@
+spring:
+  # DB Datasource 설정
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password:
+    url: jdbc:mysql://localhost:3306/mycodeReview
+  # Spring Data JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+# 로그 레벨 설정
+logging:
+  level:
+    org.springframework: info
+    org.springframework.security: trace
+    web: debug
+
+# jwt secret key
+com:
+  web:
+    jwt:
+      secret: hello
