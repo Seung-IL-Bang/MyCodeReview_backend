@@ -9,6 +9,7 @@ gradlew
 gradlew.bat
 settings.gradle
 application-oauth.yml
+application-prod.yml
 src/main/generated
 
 ### STS ###
