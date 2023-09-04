@@ -4,7 +4,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password:
-    url: jdbc:mysql://localhost:3306/mycodeReview
+    url: jdbc:mysql://localhost:3306/my_code_review
   # Spring Data JPA 설정
   jpa:
     hibernate:

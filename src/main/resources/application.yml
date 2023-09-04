@@ -9,26 +9,4 @@ spring:
       test:
         - oauth
 
----
-spring:
-  config:
-    activate:
-      on-profile: oauth
 
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
