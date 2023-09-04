@@ -1,55 +1,12 @@
 spring:
-  # DB Datasource 설정
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${USERNAME}
-    password: ${PASSWORD}
-    url: ${URL}
-  # Spring Data JPA 설정
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
-  # OAuth2 설정
   profiles:
-    include: oauth
+    active: local
+    group:
+      local:
+        - oauth
+      prod:
+        - oauth
+      test:
+        - oauth
 
-# 로그 레벨 설정
-logging:
-  level:
-    org.springframework: info
-    org.springframework.security: trace
-    web: debug
 
-# jwt secret key
-com:
-  web:
-    jwt:
-      secret: ${JWT_SECRET}
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
-
-  datasource:
-    url: jdbc:h2:mem:~/MyCodeReviewApplication
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-com:
-  web:
-    jwt:
-      secret: testKey

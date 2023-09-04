@@ -1,5 +1,7 @@
 package com.web.app.util;
 
+import com.web.app.security.exception.AccessTokenException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -62,10 +64,14 @@ public class JWTUtil {
 
         Map<String, Object> claims = null;
 
-        claims = Jwts.parser()
-                .setSigningKey(key.getBytes())
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(key.getBytes())
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.EXPIRED);
+        }
 
         return claims.get("email").toString();
     }
