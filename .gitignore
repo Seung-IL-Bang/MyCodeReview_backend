@@ -8,7 +8,8 @@ build/
 gradlew
 gradlew.bat
 settings.gradle
-application-oauth.yml
+application-localoauth.yml
+application-prodoauth.yml
 application-prod.yml
 src/main/generated
 
