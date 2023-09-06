@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -19,6 +20,15 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    @Value("${app.domain.scheme}")
+    private String SCHEME;
+
+    @Value("${app.domain.host}")
+    private String HOST;
+
+    @Value("${app.domain.port}")
+    private int PORT;
 
     private final JWTUtil jwtUtil;
 
@@ -39,9 +49,9 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
 
         String uri = UriComponentsBuilder
                 .newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(3000)
+                .scheme(SCHEME)
+                .host(HOST)
+                .port(PORT)
                 .path("/tokens")
                 .build()
                 .toUri()
@@ -55,7 +65,7 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
 
         for (Cookie cookie : cookies) {
             cookie.setMaxAge(30 * 60);
-            cookie.setDomain("localhost");
+            cookie.setDomain(HOST);
             cookie.setPath("/tokens");
             cookie.setSecure(true);
             response.addCookie(cookie);
