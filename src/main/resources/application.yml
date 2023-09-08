@@ -3,10 +3,10 @@ spring:
     active: local
     group:
       local:
-        - oauth
+        - localoauth
       prod:
-        - oauth
+        - prodoauth
       test:
-        - oauth
+        - localoauth
 
 

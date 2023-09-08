@@ -26,3 +26,11 @@ com:
   web:
     jwt:
       secret: hello
+
+
+# scheme, host, port
+app:
+  domain:
+    scheme: http
+    host: localhost
+    port: 3000

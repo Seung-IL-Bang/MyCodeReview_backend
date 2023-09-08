@@ -16,3 +16,9 @@ com:
   web:
     jwt:
       secret: testKey
+
+app:
+  domain:
+    scheme: http
+    host: localhost
+    port: 3000

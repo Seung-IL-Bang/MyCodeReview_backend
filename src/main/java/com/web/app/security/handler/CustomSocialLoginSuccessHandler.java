@@ -3,11 +3,11 @@ package com.web.app.security.handler;
 import com.web.app.security.dto.MemberSecurityDTO;
 import com.web.app.util.JWTUtil;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -19,6 +19,18 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    @Value("${app.domain.scheme}")
+    private String SCHEME;
+
+    @Value("${app.domain.host}")
+    private String HOST;
+
+    @Value("${app.domain.port}")
+    private int PORT;
+
+    @Value("${spring.profiles.active}")
+    private String PROFILE;
 
     private final JWTUtil jwtUtil;
 
@@ -37,30 +49,37 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
         String accessToken = jwtUtil.generateToken(claims, 1);
         String refreshToken = jwtUtil.generateToken(claims, 30);
 
-        String uri = UriComponentsBuilder
-                .newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(3000)
-                .path("/tokens")
-                .build()
-                .toUri()
-                .toString();
+        if (PROFILE.equals("prod")) {
+            String uri = UriComponentsBuilder
+                    .newInstance()
+                    .scheme(SCHEME)
+                    .host(HOST)
+//                    .port(PORT)
+                    .path("/tokens")
+                    .queryParam("accessToken", accessToken)
+                    .queryParam("refreshToken", refreshToken)
+                    .build()
+                    .toUri()
+                    .toString();
 
 
-        Cookie[] cookies = {
-                new Cookie("accessToken", accessToken),
-                new Cookie("refreshToken", refreshToken)
-        };
+            getRedirectStrategy().sendRedirect(request, response, uri);
 
-        for (Cookie cookie : cookies) {
-            cookie.setMaxAge(30 * 60);
-            cookie.setDomain("localhost");
-            cookie.setPath("/tokens");
-            cookie.setSecure(true);
-            response.addCookie(cookie);
+        } else if (PROFILE.equals("local") || PROFILE.equals("test")) {
+            String uri = UriComponentsBuilder
+                    .newInstance()
+                    .scheme(SCHEME)
+                    .host(HOST)
+                    .port(PORT)
+                    .path("/tokens")
+                    .queryParam("accessToken", accessToken)
+                    .queryParam("refreshToken", refreshToken)
+                    .build()
+                    .toUri()
+                    .toString();
+
+
+            getRedirectStrategy().sendRedirect(request, response, uri);
         }
-
-        getRedirectStrategy().sendRedirect(request, response, uri);
     }
 }
