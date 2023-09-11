@@ -12,6 +12,7 @@ import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.MemberRepository;
+import com.web.app.repository.ReplyRepository;
 import com.web.app.util.JWTUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class CommentServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private ReplyRepository replyRepository;
 
     @Mock
     private BoardRepository boardRepository;
@@ -179,6 +183,7 @@ class CommentServiceTest {
         assertThatCode(() -> commentService.remove(1L, request))
                 .doesNotThrowAnyException();
         verify(commentRepository, times(1)).findById(anyLong());
+        verify(replyRepository, times(1)).deleteRepliesByCommentIs(any(Comment.class));
         verify(commentRepository, times(1)).delete(any(Comment.class));
     }
 

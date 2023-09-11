@@ -11,17 +11,14 @@ import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.MemberRepository;
-import com.web.app.util.JWTUtil;
+import com.web.app.repository.ReplyRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -29,6 +26,8 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+
+    private final ReplyRepository replyRepository;
 
     private final BoardRepository boardRepository;
 
@@ -94,6 +93,7 @@ public class CommentServiceImpl implements CommentService {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
         }
 
+        replyRepository.deleteRepliesByCommentIs(comment);
         commentRepository.delete(comment);
     }
 }
