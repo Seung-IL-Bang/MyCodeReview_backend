@@ -7,13 +7,13 @@ phases:
   build:
     commands:
       - echo Phase/build Start
-      - ll
+      - ls
       - gradle wrapper
       - chmod +x ./gradlew
       - ./gradlew build
   post_build:
     commands:
-      - echo $(basename ./server/build/libs/*.jar)
+      - echo $(basename ./build/libs/*.jar)
 
 artifacts:
   files:
