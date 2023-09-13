@@ -7,6 +7,8 @@ phases:
   build:
     commands:
       - echo Phase/build Start
+      - ll
+      - gradle wrapper
       - chmod +x ./gradlew
       - ./gradlew build
   post_build:
