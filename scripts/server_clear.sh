@@ -1,0 +1,1 @@
+rm -rf /home/ubuntu/build
