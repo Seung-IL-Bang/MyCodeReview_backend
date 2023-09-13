@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/build
+
+
+hooks:
+  BeforeInstall:
+    - location: server_clear.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: initialize.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: server_start.sh
+      timeout: 300
+      runas: root
+  ApplicationStop:
+    - location: server_stop.sh
+      timeout: 300
+      runas: root
