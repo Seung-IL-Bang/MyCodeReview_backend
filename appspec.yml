@@ -8,18 +8,18 @@ files:
 
 hooks:
   BeforeInstall:
-    - location: server_clear.sh
-      timeout: 300
+    - location: backup.sh
+      timeout: 60
       runas: root
   AfterInstall:
-    - location: initialize.sh
-      timeout: 300
+    - location: chmod.sh
+      timeout: 60
       runas: root
   ApplicationStart:
-    - location: server_start.sh
-      timeout: 300
+    - location: deploy.sh
+      timeout: 180
       runas: root
-  ApplicationStop:
-    - location: server_stop.sh
-      timeout: 300
+  ValidateService:
+    - location: switch.sh
+      timeout: 180
       runas: root
