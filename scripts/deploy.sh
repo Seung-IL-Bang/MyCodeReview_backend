@@ -44,7 +44,7 @@ fi
 echo ">>> New Revision Application START in PORT:$IDLE_PORT"
 APPLICATION_PATH=$BASE_PATH/$JAR_FILE
 echo ">>> APPLICATION_PATH: " "$APPLICATION_PATH"
-nohup java -jar -Dserver.port=$IDLE_PORT "$APPLICATION_PATH" &
+nohup java -jar -Dserver.port=$IDLE_PORT "$APPLICATION_PATH" > /dev/null 2> /dev/null < /dev/null &
 
 echo ">>> Port:$IDLE_PORT Application 10초 후 Health Check 시작"
 echo "curl -s http://localhost:$IDLE_PORT/port"
