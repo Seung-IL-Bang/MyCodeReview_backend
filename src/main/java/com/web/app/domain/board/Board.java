@@ -3,6 +3,7 @@ package com.web.app.domain.board;
 import com.web.app.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Set;
@@ -19,11 +20,14 @@ public class Board extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(min = 1, max = 200, message = "제목의 글자 수는 200 자를 넘어서면 안됩니다.")
     @Column(length = 200, nullable = false)
     private String title;
 
+    @Size(min = 1, max = 3000, message = "본문의 글자 수는 3000 자를 넘어서면 안됩니다.")
     @Column(length = 3000, nullable = false)
     private String content;
+
 
     @Column(length = 50, nullable = false)
     private String writer;
