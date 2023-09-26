@@ -1,21 +1,15 @@
 package com.web.app.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.app.ControllerTestSupport;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
 import com.web.app.fixture.ReviewFixtureFactory;
-import com.web.app.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
@@ -26,22 +20,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = ReviewController.class)
-class ReviewControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private ReviewService reviewService;
-
-    @MockBean
-    private ModelMapper modelMapper;
-
-
+class ReviewControllerTest extends ControllerTestSupport {
 
     @DisplayName("Review ID 로 해당 Review 를 조회 한다.")
     @Test

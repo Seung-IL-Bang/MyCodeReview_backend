@@ -1,18 +1,13 @@
 package com.web.app.controller;
 
+import com.web.app.ControllerTestSupport;
 import com.web.app.domain.member.Member;
 import com.web.app.domain.member.MemberRole;
 import com.web.app.dto.MemberDTO;
-import com.web.app.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -22,17 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = MemberController.class )
-class MemberControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockBean
-    MemberService memberService;
-
-    @MockBean
-    ModelMapper modelMapper;
+class MemberControllerTest extends ControllerTestSupport {
 
     @DisplayName("JWT 토큰에 담긴 유저 정보를 조회한다.")
     @Test

@@ -1,53 +1,29 @@
 package com.web.app.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.app.ControllerTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.dto.BoardResponseDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
 import com.web.app.fixture.BoardFixtureFactory;
-import com.web.app.mediator.GetBoardListFromEmailOfJWT;
-import com.web.app.mediator.GetEmailFromJWT;
-import com.web.app.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = BoardController.class)
-class BoardControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private BoardService boardService;
-
-    @MockBean
-    private GetBoardListFromEmailOfJWT getBoardListFromEmailOfJWT;
-
-    @MockBean
-    private GetEmailFromJWT getEmailFromJWT;
+class BoardControllerTest extends ControllerTestSupport {
 
 
     @DisplayName("로그인 또는 비로그인 유저가 Board Id 에 해당하는 게시글을 조회합니다.")
