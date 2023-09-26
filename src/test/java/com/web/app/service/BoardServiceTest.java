@@ -1,5 +1,6 @@
 package com.web.app.service;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
 import com.web.app.domain.likes.Likes;
@@ -29,10 +30,8 @@ import java.util.NoSuchElementException;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@SpringBootTest
 @Log4j2
-public class BoardServiceTest {
+public class BoardServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private BoardService boardService;

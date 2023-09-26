@@ -1,34 +1,25 @@
 package com.web.app.repository;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.likes.Likes;
 import com.web.app.domain.member.Member;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
-import org.assertj.core.groups.Tuple;
-import org.hibernate.annotations.BatchSize;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-class BoardRepositoryTest {
+class BoardRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
     private BoardRepository boardRepository;

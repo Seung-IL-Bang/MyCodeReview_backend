@@ -1,5 +1,6 @@
 package com.web.app.service;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewResponseDTO;
@@ -10,21 +11,15 @@ import com.web.app.util.JWTUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 
-@ActiveProfiles("test")
 @Transactional(readOnly = true)
-@SpringBootTest
-class ReviewServiceTest {
+class ReviewServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private ReviewService reviewService;
