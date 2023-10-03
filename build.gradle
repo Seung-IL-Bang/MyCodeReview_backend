@@ -36,6 +36,9 @@ dependencies {
 	// Spring Data JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+	// Spring JDBC
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
 	// MySQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
