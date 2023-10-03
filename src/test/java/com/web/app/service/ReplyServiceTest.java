@@ -1,5 +1,6 @@
 package com.web.app.service;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
 import com.web.app.domain.member.Member;
@@ -19,10 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -32,9 +30,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class ReplyServiceTest {
+public class ReplyServiceTest extends IntegrationTestSupport {
 
     @InjectMocks
     private ReplyServiceImpl replyService;
