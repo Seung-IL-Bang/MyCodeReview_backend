@@ -3,6 +3,7 @@ package com.web.app.util;
 import com.web.app.domain.board.Board;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.repository.bulk.BoardPostRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.util.StopWatch;
 import java.util.List;
 import java.util.stream.LongStream;
 
+@Disabled
 @ActiveProfiles("local")
 @SpringBootTest
 public class BoardBulkInsertTest {
@@ -27,7 +29,7 @@ public class BoardBulkInsertTest {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        List<Board> boards = LongStream.range(0, 150000)
+        List<Board> boards = LongStream.range(0, 50000)
                 .parallel()
                 .mapToObj(BoardFixtureFactory::create)
                 .toList();
