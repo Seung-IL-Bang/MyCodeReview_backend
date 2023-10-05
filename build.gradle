@@ -42,6 +42,12 @@ dependencies {
 	// MySQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// Redis for Serialize & Deserialize
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 	// H2
 	runtimeOnly 'com.h2database:h2'
 
