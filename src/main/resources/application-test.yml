@@ -12,6 +12,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  # Redis cache layer 설정
+  data:
+    redis:
+      host: localhost
+      port: 6380
+  cache:
+    type: redis
+
 com:
   web:
     jwt:
