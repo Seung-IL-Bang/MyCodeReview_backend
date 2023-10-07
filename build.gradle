@@ -48,6 +48,9 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
+	// Embedded Redis for Test Environment
+	implementation 'it.ozimov:embedded-redis:0.7.2'
+
 	// H2
 	runtimeOnly 'com.h2database:h2'
 
