@@ -1,5 +1,6 @@
 package com.web.app.service;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
 import com.web.app.domain.member.Member;
@@ -19,9 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -30,15 +29,11 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
 @Transactional
-class CommentServiceTest {
+class CommentServiceTest extends IntegrationTestSupport {
 
     @InjectMocks
     private CommentServiceImpl commentService;

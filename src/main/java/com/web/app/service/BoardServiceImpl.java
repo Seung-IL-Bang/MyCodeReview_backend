@@ -8,6 +8,7 @@ import com.web.app.dto.*;
 import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,15 @@ public class BoardServiceImpl implements BoardService {
     public Long register(BoardRequestDTO boardRequestDTO) {
 
         Board board = modelMapper.map(boardRequestDTO, Board.class);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Board>> violations = validator.validate(board);
+
+        if (!violations.isEmpty()) { // 유효성 검사 실패 시 처리; 예외 던지기, 오류 메시지 반환 등
+            List<ConstraintViolation<Board>> violationsList = new ArrayList<>(violations);
+            throw new ValidationException(violationsList.get(0).getMessage());
+        }
 
         Board save = boardRepository.save(board);
 
@@ -192,7 +202,18 @@ public class BoardServiceImpl implements BoardService {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
-        board.change(boardRequestDTO.getTitle(), boardRequestDTO.getContent(), boardRequestDTO.getTagList(), boardRequestDTO.getLink(), boardRequestDTO.getDifficulty());
+        Board newBoard = modelMapper.map(boardRequestDTO, Board.class);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Board>> violations = validator.validate(newBoard);
+
+        if (!violations.isEmpty()) { // 유효성 검사 실패 시 처리; 예외 던지기, 오류 메시지 반환 등
+            List<ConstraintViolation<Board>> violationsList = new ArrayList<>(violations);
+            throw new ValidationException(violationsList.get(0).getMessage());
+        }
+
+        board.change(newBoard.getTitle(), newBoard.getContent(), newBoard.getTagList(), newBoard.getLink(), newBoard.getDifficulty());
         return boardRepository.save(board);
     }
 
