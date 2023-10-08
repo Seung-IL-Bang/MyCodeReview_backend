@@ -12,7 +12,7 @@ plugins {
 }
 
 group = 'com.web'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
