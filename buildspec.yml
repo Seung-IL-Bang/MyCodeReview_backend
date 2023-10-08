@@ -4,6 +4,9 @@ phases:
   install:
     runtime-version:
       java: corretto17
+    commands:
+      - apt update
+      - apt install -y net-tools
   build:
     commands:
       - echo Phase/build Start
