@@ -2,12 +2,14 @@ package com.web.app.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @ToString
+@NoArgsConstructor
 public class PageResponseDTO<E> {
 
     private int page;

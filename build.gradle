@@ -12,7 +12,7 @@ plugins {
 }
 
 group = 'com.web'
-version = '1.0.1-SNAPSHOT'
+version = '1.1.0-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
@@ -36,8 +36,20 @@ dependencies {
 	// Spring Data JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+	// Spring JDBC
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
 	// MySQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// Redis for Serialize & Deserialize
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// Embedded Redis for Test Environment
+	implementation 'it.ozimov:embedded-redis:0.7.2'
 
 	// H2
 	runtimeOnly 'com.h2database:h2'
