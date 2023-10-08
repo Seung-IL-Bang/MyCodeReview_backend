@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
 
@@ -42,6 +43,7 @@ public class Board extends BaseTimeEntity {
     private String link;
 
     @ElementCollection
+    @BatchSize(size = 10)
     private Set<String> tagList;
 
     @Column
