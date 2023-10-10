@@ -43,8 +43,8 @@
 ## Description
 
 🔎 목차
-  - [단위 테스트 & 테스트 환경 최적화](#단위-테스트-&-테스트-환경-최적화)
-  - [AWS Pipeline & Nginx를 활용한 무중단 배포](#AWS-Pipeline-&-Nginx를-활용한-무중단-배포)
+  - [단위 테스트 & 테스트 환경 최적화](#단위-테스트-작성--테스트-환경-최적화)
+  - [AWS Pipeline & Nginx를 활용한 무중단 배포](#aws-pipeline--nginx를-활용한-무중단-배포)
 
 ---
 
