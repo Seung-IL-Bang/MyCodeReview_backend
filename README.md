@@ -79,7 +79,7 @@
 ## AWS Pipeline & Nginx를 활용한 무중단 배포
 ![image](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/d2fcfb9c-a6d1-4620-be94-140c27d8cc34)
 
-- 개발을 진행하면서 새로운 코드를 서버에 수동을 매번 통합하는 것은 번거로운 작업이었습니다.
+- 개발을 진행하면서 새로운 코드를 서버에 수동으로 매번 통합하는 것은 번거로운 작업이었습니다.
 - 수동으로 배포시 실수로 인해 제대로 배포가 진행되지 않는 경우도 있었으며, 배포가 진행될 때마다 애플리케이션이 중단되어야만 했습니다.
 - 비효율적인 수동 배포와 서버가 중단되는 문제점을 해결하고자, AWS Pipeline과 Nginx를 도입했습니다.
 - AWS Pipeline은 [Github 소스 - CodeBuild - CodeDeploy]로 구성되며 새롭게 추가된 코드를 자동으로 EC2 인스턴스에 배포할 수 있도록 도와주는 CI/CD 파이프라인입니다.
