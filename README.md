@@ -12,7 +12,8 @@
 
 
 ## Architecture
-![My Review](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/d30cb707-3e95-4272-aed3-e356e20a8743)
+![My Review](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/571540ca-b92c-475c-972b-9933b1d989ce)
+
 
 
 ## ERD
