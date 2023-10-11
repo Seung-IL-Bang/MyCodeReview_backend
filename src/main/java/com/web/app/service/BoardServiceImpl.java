@@ -56,7 +56,7 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponseDTO read(Long id, String requestEmail) {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> {
-            throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
+            throw new NoSuchElementException("해당 게시글은 존재하지 않습니다.");
         });
 
         BoardResponseDTO dto = modelMapper.map(board, BoardResponseDTO.class);
