@@ -45,6 +45,7 @@
 🔎 목차
   - [단위 테스트 & 테스트 환경 최적화](#단위-테스트-작성--테스트-환경-최적화)
   - [AWS Pipeline & Nginx를 활용한 무중단 배포](#aws-pipeline--nginx를-활용한-무중단-배포)
+  - [낙관적 락을 이용한 좋아요 기능 동시성 제어](#낙관적-락을-이용한-좋아요-기능-동시성-제어)
   - [Swagger를 사용한 API 문서화](#swagger를-사용한-api-문서화)
 
 ---
@@ -85,6 +86,37 @@
 - 비효율적인 수동 배포와 서버가 중단되는 문제점을 해결하고자, AWS Pipeline과 Nginx를 도입했습니다.
 - AWS Pipeline은 [Github 소스 - CodeBuild - CodeDeploy]로 구성되며 새롭게 추가된 코드를 자동으로 EC2 인스턴스에 배포할 수 있도록 도와주는 CI/CD 파이프라인입니다.
 - Nginx를 사용하여 현재 사용하고 있는 애플리케이션과 IDLE(휴식) 애플리케이션을 교차 사용해가면서 Nginx Reload를 통해 서버가 무중단 배포될 수 있도록 구현했습니다.
+
+## 낙관적 락을 이용한 좋아요 기능 동시성 제어
+- 게시글의 좋아요 기능은 동시다발적인 요청이 발생 가능하기 때문에 동시성 이슈로 인해 데이터 정합성이 깨질 우려가 있습니다.
+- 데이터 정합성을 보장하기 위해서 낙관적 락을 구현할 수 있도록 해주는 `@Version` 애너테이션을 게시글 엔티티 필드에 적용했습니다.
+- 동시성 문제로 인해 업데이트에 실패했을 경우 좋아요 요청을 자동으로 재시도하는 로직도 구현했습니다.
+
+```java
+  try {
+      likesService.postLike(likeRequestDTO);
+  } catch (ObjectOptimisticLockingFailureException e) { // 좋아요 트랜잭션이 실패한 경우 ObjectOptimisticLockingFailureException 예외 발생
+      int maxAttempt = 3;
+      for (int attempt = 1; attempt <= maxAttempt; attempt++) { // 최대 3회까지 좋아요 재시도
+          try {
+              likesService.postLike(likeRequestDTO);
+              break;
+          } catch (ObjectOptimisticLockingFailureException oe) {
+              if (attempt == maxAttempt) {
+                  throw new BusinessLogicException(ExceptionCode.LOCKING_FAILURE); // 3회 재시도 후에도 실패할 경우 유저에게 '잠시 후 재시도 요청' 알림
+              }
+          }
+      }
+  }
+```
+
+- Future 인터페이스를 사용하여 멀티 스레드를 활용한 동시성 이슈 테스트를 진행했습니다.
+  1. 동시성 이슈 발생 시 낙관적 락킹 예외가 잘 발생하는지 테스트 했습니다.
+  2. 동시성 이슈 발생 시 자동 재요청 로직이 제대로 작동하여 데이터 정합성이 잘 보장되는지 테스트 했습니다.
+
+<img width="489" alt="스크린샷 2023-10-11 오후 10 31 02" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/7851a40d-9e36-4631-85a2-a0ad6df44821">
+
+
 
 ## Swagger를 사용한 API 문서화
 - 예전에 진행했던 팀프로젝트의 경우 초기에 API 문서를 수동으로 관리했었습니다. 수동으로 관리하게 되면 기능의 추가나 수정이 생겼을 경우 매번 API 문서도 직접 수정해야 했습니다. 반복적인 수정 작업은 비효율적이며 실수가 생길 가능성이 컸습니다.
