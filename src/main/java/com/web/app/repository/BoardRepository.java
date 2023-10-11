@@ -4,16 +4,22 @@ import com.web.app.domain.board.Board;
 import com.web.app.repository.search.BoardSearch;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch {
 
     @Query("select b from Board b where b.email = :email")
+    @EntityGraph(attributePaths = "tagList")
     List<Board> findListAll(@Param("email") String email);
+
+    @EntityGraph(attributePaths = "tagList")
+    Optional<Board> findById(Long id);
 
     @Query("select count(b.id) from Board b where b.email = :email")
     int getCount(@Param("email") String email);
