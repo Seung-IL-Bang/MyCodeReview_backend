@@ -89,7 +89,7 @@
 - Nginx를 사용하여 현재 사용하고 있는 애플리케이션과 IDLE(휴식) 애플리케이션을 교차 사용해가면서 Nginx Reload를 통해 서버가 무중단 배포될 수 있도록 구현했습니다.
 
 ## N+1 문제 해결
-<a href="https://devlog-seung-il-bang.vercel.app/orm-jpa-n+1-problem" target="_blank">N+1 문제에 대한 탐구 정리글</a>
+[N+1 문제에 대한 탐구 정리글](https://devlog-seung-il-bang.vercel.app/orm-jpa-n+1-problem)
 - 사용자 본인의 게시물 목록을 조회해오는 로직에서 게시물들의 태그 목록들을 집계하는 순간 N+1 문제가 발생하는 것을 발견했습니다.
 - 처음 시도한 해결 방법으로는 연관 엔티티에 `@Batchsize` 애너테이션을 적용하였고, 쿼리에 IN 절이 추가되어 N+1 문제를 어느 정도 완화시킬 수 있었습니다.
 - 하지만, 완전히 N+1 문제가 해결되는 것이 아니었습니다. 다음과 같은 문제가 여전히 존재했습니다.
