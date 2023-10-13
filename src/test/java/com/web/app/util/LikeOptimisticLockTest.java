@@ -1,30 +1,37 @@
 package com.web.app.util;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.member.Member;
 import com.web.app.dto.LikeRequestDTO;
 import com.web.app.exception.BusinessLogicException;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
+import com.web.app.proxy.LikesUseCase;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.LikesRepository;
 import com.web.app.repository.MemberRepository;
 import com.web.app.service.LikesService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.dao.OptimisticLockingFailureException;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class LikeOptimisticLockTest {
+public class LikeOptimisticLockTest extends IntegrationTestSupport {
+
+    @Autowired
+    private LikesUseCase likesUseCase;
 
     @Autowired
     private LikesService likesService;
@@ -35,50 +42,190 @@ public class LikeOptimisticLockTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private LikesRepository likesRepository;
 
-    @DisplayName("낙관적 락을 통한 좋아요 기능 동시성 제어")
+    @AfterEach
+    void tearDown() {
+        likesRepository.deleteAllInBatch();
+        boardRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+    }
+
+    @DisplayName("좋아요 기능의 동시성 이슈 발생 시 낙관적 락킹 실패 예외가 던져진다.")
     @Test
-    void optimisticLockingLike() {
+    void optimisticLockingLikePost1() {
         // given
         int numberOfThreads = 3;
-
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
 
         Board savedBoard = boardRepository.save(BoardFixtureFactory.create());
-        Member savedMember = memberRepository.save(MemberFixtureFactory.create());
+        List<Member> savedMembers = IntStream.rangeClosed(1, numberOfThreads)
+                .mapToObj(i -> memberRepository.save(MemberFixtureFactory.create((long) i)))
+                .collect(Collectors.toList());
+        List<LikeRequestDTO> likeRequestDTOs = savedMembers.stream()
+                .map(member -> new LikeRequestDTO(savedBoard.getId(), member.getEmail()))
+                .collect(Collectors.toList());
 
-        LikeRequestDTO likeRequestDTO = new LikeRequestDTO(savedBoard.getId(), savedMember.getEmail());
-
-        Future<?> future1 = executorService.submit(() -> {
-            try {
-                likesService.postLike(likeRequestDTO);
-            } catch (BusinessLogicException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        Future<?> future2 = executorService.submit(() -> {
-            try {
-                likesService.postLike(likeRequestDTO);
-            } catch (BusinessLogicException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        Future<?> future3 = executorService.submit(() -> {
-            try {
-                likesService.postLike(likeRequestDTO);
-            } catch (BusinessLogicException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        List<Future<?>> futures = likeRequestDTOs.stream()
+                .map(likeRequestDTO -> executorService.submit(() -> {
+                    try {
+                        likesService.postLike(likeRequestDTO);
+                    } catch (BusinessLogicException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }))
+                .collect(Collectors.toList());
 
         // when // then
         assertThatThrownBy(() -> {
-            future1.get();
-            future2.get();
-            future3.get();
+            futures.forEach(future -> {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) { // Future 인터페이스의 get() 메서드는 예외 처리시 본래 예외 'cause' 를 ExecutionException 으로 캡슐화하여 통합 처리한다.
+                    throw new RuntimeException(e.getCause()); // getCause() 메서드로 본래 예외인 OptimisticLockingFailureException 추출
+                }
+            });
         })
-                .isInstanceOf(ExecutionException.class);
+                .isInstanceOf(RuntimeException.class)
+                .hasCauseInstanceOf(OptimisticLockingFailureException.class);
     }
 
+    @DisplayName("좋아요 기능의 동시성 이슈 발생 시 자동 재요청 로직이 성공적으로 작동한다.")
+    @Test
+    void optimisticLockingLikePost2() {
+        // given
+        int numberOfThreads = 3;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+
+        Board savedBoard = boardRepository.save(BoardFixtureFactory.create());
+        List<Member> savedMembers = IntStream.rangeClosed(1, numberOfThreads)
+                .mapToObj(i -> memberRepository.save(MemberFixtureFactory.create((long) i)))
+                .collect(Collectors.toList());
+        List<LikeRequestDTO> likeRequestDTOs = savedMembers.stream()
+                .map(member -> new LikeRequestDTO(savedBoard.getId(), member.getEmail()))
+                .collect(Collectors.toList());
+
+        List<Future<?>> futures = likeRequestDTOs.stream()
+                .map(likeRequestDTO -> executorService.submit(() -> {
+                    try {
+                        likesUseCase.executePost(likeRequestDTO);
+                    } catch (BusinessLogicException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }))
+                .collect(Collectors.toList());
+
+
+        // when // then
+        assertThatCode(() -> {
+            futures.forEach(future -> {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e.getCause());
+                }
+            });
+        }).doesNotThrowAnyException();
+
+        Board LikedBoard = boardRepository.findById(savedBoard.getId()).orElseThrow();
+        assertThat(LikedBoard.getLikeCount()).isEqualTo(numberOfThreads);
+    }
+
+    @DisplayName("좋아요 취소 기능의 동시성 이슈 발생 시 낙관적 락킹 실패 예외가 던져진다.")
+    @Test
+    void optimisticLockingLikeDelete1() {
+        // given
+        int numberOfThreads = 3;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+
+        Board savedBoard = boardRepository.save(BoardFixtureFactory.create());
+        List<Member> savedMembers = IntStream.rangeClosed(1, numberOfThreads)
+                .mapToObj(i -> memberRepository.save(MemberFixtureFactory.create((long) i)))
+                .collect(Collectors.toList());
+        List<LikeRequestDTO> likeRequestDTOs = savedMembers.stream()
+                .map(member -> new LikeRequestDTO(savedBoard.getId(), member.getEmail()))
+                .collect(Collectors.toList());
+
+        likeRequestDTOs.stream().forEach(likeRequestDTO -> {
+            try {
+                likesUseCase.executePost(likeRequestDTO);
+            } catch (BusinessLogicException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        List<Future<?>> futures = likeRequestDTOs.stream()
+                .map(likeRequestDTO -> executorService.submit(() -> {
+                    try {
+                        likesService.deleteLike(likeRequestDTO);
+                    } catch (BusinessLogicException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }))
+                .collect(Collectors.toList());
+
+        // when // then
+        assertThatThrownBy(() -> {
+            futures.forEach(future -> {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e.getCause());
+                }
+            });
+        })
+                .isInstanceOf(RuntimeException.class)
+                .hasCauseInstanceOf(OptimisticLockingFailureException.class);
+    }
+
+    @DisplayName("좋아요 취소 기능의 동시성 이슈 발생 시 자동 재요청 로직이 성공적으로 작동한다.")
+    @Test
+    void optimisticLockingLikeDelete2() {
+        // given
+        int numberOfThreads = 3;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+
+        Board savedBoard = boardRepository.save(BoardFixtureFactory.create());
+        List<Member> savedMembers = IntStream.rangeClosed(1, numberOfThreads)
+                .mapToObj(i -> memberRepository.save(MemberFixtureFactory.create((long) i)))
+                .collect(Collectors.toList());
+        List<LikeRequestDTO> likeRequestDTOs = savedMembers.stream()
+                .map(member -> new LikeRequestDTO(savedBoard.getId(), member.getEmail()))
+                .collect(Collectors.toList());
+
+        likeRequestDTOs.stream().forEach(likeRequestDTO -> {
+            try {
+                likesUseCase.executePost(likeRequestDTO);
+            } catch (BusinessLogicException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        List<Future<?>> futures = likeRequestDTOs.stream()
+                .map(likeRequestDTO -> executorService.submit(() -> {
+                    try {
+                        likesUseCase.executeDelete(likeRequestDTO);
+                    } catch (BusinessLogicException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }))
+                .collect(Collectors.toList());
+
+
+        // when // then
+        assertThatCode(() -> {
+            futures.forEach(future -> {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e.getCause());
+                }
+            });
+        }).doesNotThrowAnyException();
+
+        Board LikedBoard = boardRepository.findById(savedBoard.getId()).orElseThrow();
+        assertThat(LikedBoard.getLikeCount()).isZero();
+    }
 
 }

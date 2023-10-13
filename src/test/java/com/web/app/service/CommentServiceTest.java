@@ -9,7 +9,6 @@ import com.web.app.exception.BusinessLogicException;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.CommentFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
-import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.MemberRepository;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -49,9 +47,6 @@ class CommentServiceTest extends IntegrationTestSupport {
 
     @Mock
     private CommentRepository commentRepository;
-
-    @Mock
-    private GetEmailFromJWT getEmailFromJWT;
 
     @Autowired
     private JWTUtil jwtUtil;
@@ -107,9 +102,7 @@ class CommentServiceTest extends IntegrationTestSupport {
                 .findById(anyLong());
 
         MockHttpServletRequest request = getRequestWithJWT(member.getName(), member.getEmail());
-        doReturn(member.getEmail())
-                .when(getEmailFromJWT)
-                .execute(any(MockHttpServletRequest.class));
+        request.setAttribute("userEmail", member.getEmail());
 
         // when // then
         assertThatCode(() -> commentService.update(commentRequestDTO, request))
@@ -142,9 +135,8 @@ class CommentServiceTest extends IntegrationTestSupport {
                 .findById(anyLong());
 
         MockHttpServletRequest request = getRequestWithJWT(member2.getName(), member2.getEmail());
-        doReturn(member2.getEmail())
-                .when(getEmailFromJWT)
-                .execute(any(MockHttpServletRequest.class));
+        request.setAttribute("userEmail", member2.getEmail());
+
 
         // when // then
         assertThatThrownBy(() -> commentService.update(commentRequestDTO, request))
@@ -170,9 +162,8 @@ class CommentServiceTest extends IntegrationTestSupport {
                 .findById(anyLong());
 
         MockHttpServletRequest request = getRequestWithJWT(member.getName(), member.getEmail());
-        doReturn(member.getEmail())
-                .when(getEmailFromJWT)
-                .execute(any(MockHttpServletRequest.class));
+        request.setAttribute("userEmail", member.getEmail());
+
 
         // when // then
         assertThatCode(() -> commentService.remove(1L, request))
@@ -201,9 +192,8 @@ class CommentServiceTest extends IntegrationTestSupport {
                 .findById(anyLong());
 
         MockHttpServletRequest request = getRequestWithJWT(member2.getName(), member2.getEmail());
-        doReturn(member2.getEmail())
-                .when(getEmailFromJWT)
-                .execute(any(MockHttpServletRequest.class));
+        request.setAttribute("userEmail", member2.getEmail());
+
 
         // when // then
         assertThatThrownBy(() -> commentService.remove(comment.getId(), request))

@@ -10,7 +10,6 @@ import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.CommentFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
 import com.web.app.fixture.ReplyFixtureFactory;
-import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.MemberRepository;
 import com.web.app.repository.ReplyRepository;
@@ -43,9 +42,6 @@ public class ReplyServiceTest extends IntegrationTestSupport {
 
     @Mock
     private ReplyRepository replyRepository;
-
-    @Mock
-    private GetEmailFromJWT getEmailFromJWT;
 
     @Autowired
     private JWTUtil jwtUtil;
@@ -102,9 +98,7 @@ public class ReplyServiceTest extends IntegrationTestSupport {
                 .findById(anyLong());
 
         MockHttpServletRequest request = getRequestWithJWT(member.getName(), member.getEmail());
-        doReturn(member.getEmail())
-                .when(getEmailFromJWT)
-                .execute(any(MockHttpServletRequest.class));
+        request.setAttribute("userEmail", member.getEmail());
 
         // when // then
         assertThatCode(() -> replyService.update(replyRequestDTO, request))
@@ -134,10 +128,9 @@ public class ReplyServiceTest extends IntegrationTestSupport {
                 .findById(anyLong());
 
         MockHttpServletRequest request = getRequestWithJWT(member.getName(), member.getEmail());
-        doReturn(member.getEmail())
-                .when(getEmailFromJWT)
-                .execute(any(MockHttpServletRequest.class));
-        
+        request.setAttribute("userEmail", member.getEmail());
+
+
         // when // then
         assertThatCode(() -> replyService.remove(reply.getId(), request))
                 .doesNotThrowAnyException();

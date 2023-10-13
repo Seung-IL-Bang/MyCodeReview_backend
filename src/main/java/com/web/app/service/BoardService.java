@@ -8,21 +8,17 @@ import java.util.List;
 
 public interface BoardService {
 
-    public Long register(BoardRequestDTO BoardRequestDTO);
+    Long register(BoardRequestDTO BoardRequestDTO);
 
-    public BoardResponseDTO read(Long id, String requestEmail);
+    Board modify(HttpServletRequest request, Long id, BoardRequestDTO BoardRequestDTO);
 
-    public List<Board> readAll(String email);
+    void remove(HttpServletRequest request, Long id);
 
-    public PageResponseDTO<BoardRequestDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO);
+    BoardResponseDTO read(Long id, HttpServletRequest request);
 
-    public PageResponseWithCategoryDTO<BoardListResponseDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO);
+    PageResponseDTO<BoardResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO);
 
-    public Board modify(HttpServletRequest request, Long id, BoardRequestDTO BoardRequestDTO);
+    PageResponseWithCategoryDTO<BoardListResponseDTO> readAllWithPagingAndSearch(HttpServletRequest request, PageRequestDTO pageRequestDTO);
 
-    public void remove(HttpServletRequest request, Long id);
-
-    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPaging(PageRequestDTO pageRequestDTO);
-
-    PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(String email, PageRequestDTO pageRequestDTO);
+    PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(HttpServletRequest request, PageRequestDTO pageRequestDTO);
 }

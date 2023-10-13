@@ -24,7 +24,7 @@ class LikesControllerTest extends ControllerTestSupport {
         Long boardId = 1L;
         LikeRequestDTO likeRequestDTO = new LikeRequestDTO(boardId, "test@gmail.com");
 
-        willDoNothing().given(likesService).postLike(any(LikeRequestDTO.class));
+        willDoNothing().given(likesUseCase).executePost(any(LikeRequestDTO.class));
 
         // when // then
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/like")
@@ -46,7 +46,7 @@ class LikesControllerTest extends ControllerTestSupport {
         Long boardId = 1L;
         LikeRequestDTO likeRequestDTO = new LikeRequestDTO(boardId, "test@gmail.com");
 
-        willDoNothing().given(likesService).deleteLike(any(LikeRequestDTO.class));
+        willDoNothing().given(likesUseCase).executeDelete(any(LikeRequestDTO.class));
         
         // when // then
         mockMvc.perform(MockMvcRequestBuilders.delete("/auth/like")

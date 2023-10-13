@@ -2,8 +2,7 @@ package com.web.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.app.controller.*;
-import com.web.app.mediator.GetBoardListFromEmailOfJWT;
-import com.web.app.mediator.GetEmailFromJWT;
+import com.web.app.proxy.LikesUseCase;
 import com.web.app.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,19 +35,13 @@ public abstract class ControllerTestSupport {
     @MockBean
     protected BoardService boardService;
 
-    @MockBean
-    protected GetBoardListFromEmailOfJWT getBoardListFromEmailOfJWT;
-
-    @MockBean
-    protected GetEmailFromJWT getEmailFromJWT;
-
     // CommentController
     @MockBean
     protected CommentService commentService;
 
     // LikesController
     @MockBean
-    protected LikesService likesService;
+    protected LikesUseCase likesUseCase;
 
     // MemberController
     @MockBean

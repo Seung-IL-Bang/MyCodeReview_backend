@@ -8,7 +8,6 @@ import com.web.app.dto.ReplyRequestDTO;
 import com.web.app.dto.ReplyResponseDTO;
 import com.web.app.exception.BusinessLogicException;
 import com.web.app.exception.ExceptionCode;
-import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.MemberRepository;
 import com.web.app.repository.ReplyRepository;
@@ -30,8 +29,6 @@ public class ReplyServiceImpl implements ReplyService {
     private final CommentRepository commentRepository;
 
     private final MemberRepository memberRepository;
-
-    private final GetEmailFromJWT getEmailFromJWT;
 
 
     @Override
@@ -67,7 +64,8 @@ public class ReplyServiceImpl implements ReplyService {
             throw new NoSuchElementException("해당 답글을 존재하지 않습니다.");
         });
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
+
 
         if (!Objects.equals(reply.getMember().getEmail(), requestEmail)) {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
@@ -85,7 +83,7 @@ public class ReplyServiceImpl implements ReplyService {
             throw new NoSuchElementException("해당 답글은 존재하지 않습니다.");
         });
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
 
         if (!Objects.equals(reply.getMember().getEmail(), requestEmail)) {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
