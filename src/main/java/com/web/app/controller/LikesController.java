@@ -2,14 +2,11 @@ package com.web.app.controller;
 
 import com.web.app.dto.LikeRequestDTO;
 import com.web.app.exception.BusinessLogicException;
-import com.web.app.exception.ExceptionCode;
-import com.web.app.mediator.LikesUseCase;
-import com.web.app.service.LikesService;
+import com.web.app.proxy.LikesUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,21 +1,22 @@
 package com.web.app.util;
 
+import com.web.app.IntegrationTestSupport;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.member.Member;
 import com.web.app.dto.LikeRequestDTO;
 import com.web.app.exception.BusinessLogicException;
 import com.web.app.fixture.BoardFixtureFactory;
 import com.web.app.fixture.MemberFixtureFactory;
-import com.web.app.mediator.LikesUseCase;
+import com.web.app.proxy.LikesUseCase;
 import com.web.app.repository.BoardRepository;
+import com.web.app.repository.LikesRepository;
 import com.web.app.repository.MemberRepository;
 import com.web.app.service.LikesService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -27,9 +28,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class LikeOptimisticLockTest {
+public class LikeOptimisticLockTest extends IntegrationTestSupport {
 
     @Autowired
     private LikesUseCase likesUseCase;
@@ -43,6 +42,15 @@ public class LikeOptimisticLockTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private LikesRepository likesRepository;
+
+    @AfterEach
+    void tearDown() {
+        likesRepository.deleteAllInBatch();
+        boardRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+    }
 
     @DisplayName("좋아요 기능의 동시성 이슈 발생 시 낙관적 락킹 실패 예외가 던져진다.")
     @Test

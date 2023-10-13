@@ -1,4 +1,4 @@
-package com.web.app.mediator;
+package com.web.app.proxy;
 
 import com.web.app.dto.LikeRequestDTO;
 import com.web.app.exception.BusinessLogicException;

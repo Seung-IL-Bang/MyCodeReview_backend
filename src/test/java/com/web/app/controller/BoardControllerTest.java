@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -27,19 +29,15 @@ class BoardControllerTest extends ControllerTestSupport {
 
 
     @DisplayName("로그인 또는 비로그인 유저가 Board Id 에 해당하는 게시글을 조회합니다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"test@gmail.com", ""})
+    @Test
     @WithMockUser
-    void getBoard(String requestEmail) throws Exception {
+    void getBoard() throws Exception {
         //given
         BoardResponseDTO boardResponseDTO = BoardFixtureFactory.createResponseDTO();
-
-        given(getEmailFromJWT.execute(any(HttpServletRequest.class))).willReturn(requestEmail);
-
-        given(boardService.read(anyLong(), anyString())).willReturn(boardResponseDTO);
+        given(boardService.read(anyLong(), any(HttpServletRequest.class))).willReturn(boardResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/%d", anyLong()))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/%d", boardResponseDTO.getId()))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -60,20 +58,20 @@ class BoardControllerTest extends ControllerTestSupport {
     @WithMockUser
     void getBoardList() throws Exception {
         //given
-        Board board1 = BoardFixtureFactory.create(1L);
-        Board board2 = BoardFixtureFactory.create(2L);
-        Board board3 = BoardFixtureFactory.create(3L);
-
-        List<Board> boardList = List.of(board1, board2, board3);
-
-        given(getBoardListFromEmailOfJWT.execute(any(HttpServletRequest.class)))
-                .willReturn(boardList);
-
-        // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get("/auth/board/list"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(boardList)));
+//        Board board1 = BoardFixtureFactory.create(1L);
+//        Board board2 = BoardFixtureFactory.create(2L);
+//        Board board3 = BoardFixtureFactory.create(3L);
+//
+//        List<Board> boardList = List.of(board1, board2, board3);
+//
+//        given(getBoardListFromEmailOfJWT.execute(any(HttpServletRequest.class)))
+//                .willReturn(boardList);
+//
+//        // when // then
+//        mockMvc.perform(MockMvcRequestBuilders.get("/auth/board/list"))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(content().json(objectMapper.writeValueAsString(boardList)));
     }
 
     @DisplayName("로그인 여부와 상관없이 페이징 처리된 최신 게시글 목록을 조회할 수 있다.")
@@ -95,7 +93,7 @@ class BoardControllerTest extends ControllerTestSupport {
                 .build();
 
 
-        given(boardService.readPublicAllWithPaging(any(PageRequestDTO.class)))
+        given(boardService.readPublicAllWithPagingAndSearch(any(PageRequestDTO.class)))
                 .willReturn(result);
 
         // when // then

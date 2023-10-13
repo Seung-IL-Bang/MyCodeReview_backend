@@ -7,7 +7,6 @@ import com.web.app.dto.CommentRequestDTO;
 import com.web.app.dto.CommentResponseDTO;
 import com.web.app.exception.BusinessLogicException;
 import com.web.app.exception.ExceptionCode;
-import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.MemberRepository;
@@ -32,9 +31,6 @@ public class CommentServiceImpl implements CommentService {
     private final BoardRepository boardRepository;
 
     private final MemberRepository memberRepository;
-
-    private final GetEmailFromJWT getEmailFromJWT;
-
 
     @Override
     public CommentResponseDTO register(CommentRequestDTO commentRequestDTO) {
@@ -69,7 +65,7 @@ public class CommentServiceImpl implements CommentService {
             throw new NoSuchElementException("해당 댓글은 존재하지 않습니다.");
         });
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
 
         if (!Objects.equals(comment.getMember().getEmail(), requestEmail)) {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
@@ -87,7 +83,8 @@ public class CommentServiceImpl implements CommentService {
             throw new NoSuchElementException("해당 댓글은 존재하지 않습니다.");
         });
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
+
 
         if (!Objects.equals(comment.getMember().getEmail(), requestEmail)) {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
