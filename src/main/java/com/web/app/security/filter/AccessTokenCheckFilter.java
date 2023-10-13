@@ -61,7 +61,8 @@ public class AccessTokenCheckFilter extends OncePerRequestFilter {
         }
 
         try {
-            jwtUtil.validateToken(tokenBody);
+            Map<String, Object> claims = jwtUtil.validateToken(tokenBody);
+            request.setAttribute("userEmail", claims.get("email").toString());
         } catch (MalformedJwtException malformedJwtException) {
             log.info("MalformedJwtException---------------------------------------");
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.MALFORM);

@@ -7,7 +7,6 @@ import com.web.app.dto.CommentResponseDTO;
 import com.web.app.dto.ReviewListDTO;
 import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
-import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.CommentRepository;
 import com.web.app.repository.LikesRepository;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -30,7 +28,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
-    private final GetEmailFromJWT getEmailFromJWT;
     private final LikesRepository likesRepository;
 
 
@@ -39,7 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Board board = boardRepository.findById(boardId).orElseThrow();
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
 
         if (!board.getEmail().equals(requestEmail) || requestEmail.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
@@ -60,7 +57,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(findReview.getBoard());
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        Object userEmail = request.getAttribute("userEmail");
+        String requestEmail = userEmail == null ? "" : userEmail.toString();
 
         List<Long> liked;
         if (requestEmail.isBlank()) {
@@ -98,7 +96,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review findOne = reviewRepository.findById(id).orElseThrow();
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
 
         if (!findOne.getBoard().getEmail().equals(requestEmail) || requestEmail.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
@@ -116,7 +114,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review review = reviewRepository.findById(id).orElseThrow();
 
-        String requestEmail = getEmailFromJWT.execute(request);
+        String requestEmail = (String) request.getAttribute("userEmail");
 
         if (!review.getBoard().getEmail().equals(requestEmail) || requestEmail.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");

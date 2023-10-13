@@ -5,7 +5,6 @@ import com.web.app.domain.comment.Comment;
 import com.web.app.domain.reply.Reply;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.*;
-import com.web.app.mediator.GetEmailFromJWT;
 import com.web.app.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
@@ -31,7 +30,6 @@ public class BoardServiceImpl implements BoardService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
-    private final GetEmailFromJWT getEmailFromJWT;
 
     @Override
     public Long register(BoardRequestDTO boardRequestDTO) {
@@ -53,7 +51,10 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponseDTO read(Long id, String requestEmail) {
+    public BoardResponseDTO read(Long id, HttpServletRequest request) {
+
+        Object userEmail = request.getAttribute("userEmail");
+        String requestEmail = userEmail == null ? "" : userEmail.toString();
 
         Board board = boardRepository.findById(id).orElseThrow(() -> {
             throw new NoSuchElementException("해당 게시글은 존재하지 않습니다.");
@@ -107,38 +108,10 @@ public class BoardServiceImpl implements BoardService {
         return dto;
     }
 
-    @Override
-    public List<Board> readAll(String email) {
-
-        List<Board> listAll = boardRepository.findListAll(email);
-
-        return listAll;
-    }
-
-    @Override
-    public PageResponseDTO<BoardRequestDTO> readAllWithPaging(String email, PageRequestDTO pageRequestDTO) {
-
-        Pageable pageable = pageRequestDTO.getPageable("id");
-
-        Page<Board> result = boardRepository.findByEmailOrderByIdDesc(email, pageable);
-
-        List<BoardRequestDTO> dtoList = result.getContent().stream()
-                .map(board -> modelMapper.map(board, BoardRequestDTO.class))
-                .collect(Collectors.toList());
-
-        int total = boardRepository.getCount(email);
-
-        PageResponseDTO<BoardRequestDTO> pageResponseDTO = PageResponseDTO.<BoardRequestDTO>builder()
-                .dtoList(dtoList)
-                .pageRequestDTO(pageRequestDTO)
-                .total(total)
-                .build();
-        return pageResponseDTO;
-    }
 
     // Version 2
     @Override
-    public PageResponseWithCategoryDTO<BoardListResponseDTO> readAllWithPagingAndSearch(String email, PageRequestDTO pageRequestDTO) {
+    public PageResponseWithCategoryDTO<BoardListResponseDTO> readAllWithPagingAndSearch(HttpServletRequest request, PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("id");
 
@@ -149,6 +122,8 @@ public class BoardServiceImpl implements BoardService {
         String keyword = pageRequestDTO.getKeyword();
 
         String tag = pageRequestDTO.getTag();
+
+        String email = (String) request.getAttribute("userEmail");
 
         List<Board> boards = boardRepository.findListAll(email);
 
@@ -197,7 +172,7 @@ public class BoardServiceImpl implements BoardService {
 
         Board board = result.orElseThrow();
 
-        String email = getEmailFromJWT.execute(request);
+        String email = (String) request.getAttribute("userEmail");
 
         if (!board.getEmail().equals(email) || email.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
@@ -220,12 +195,10 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void remove(HttpServletRequest request, Long id) {
-
-
         // 예외 처리를 위해 deleteById 미사용
         Board board = boardRepository.findById(id).orElseThrow();
 
-        String email = getEmailFromJWT.execute(request);
+        String email = (String) request.getAttribute("userEmail");
 
         if (!board.getEmail().equals(email) || email.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
@@ -243,8 +216,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    @Cacheable(cacheNames = "readPublicAll", key = "#pageRequestDTO.page")
-    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPaging(PageRequestDTO pageRequestDTO) {
+//    @Cacheable(cacheNames = "readPublicAll", key = "#pageRequestDTO.page")
+    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("createdAt");
 
@@ -268,7 +241,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(String email, PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<BoardResponseDTO> readByEmailLikeBoardsWithPaging(HttpServletRequest request, PageRequestDTO pageRequestDTO) {
+
+        String email = (String) request.getAttribute("userEmail");
 
         Page<Board> favoriteListByEmail = boardRepository.findFavoriteListByEmail(email, pageRequestDTO.getPageable());
 
