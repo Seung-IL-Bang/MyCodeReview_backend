@@ -16,7 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
         LikesController.class,
         MemberController.class,
         ReplyController.class,
-        ReviewController.class
+        ReviewController.class,
+        AdminController.class
 })
 public abstract class ControllerTestSupport {
 
@@ -55,5 +56,7 @@ public abstract class ControllerTestSupport {
     @MockBean
     protected ReviewService reviewService;
 
-
+    // AdminController
+    @MockBean
+    protected AdminService adminService;
 }
