@@ -1,6 +1,5 @@
 package com.web.app.security.filter;
 
-import com.web.app.security.auth.CustomOAuth2UserService;
 import com.web.app.security.exception.AccessTokenException;
 import com.web.app.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -64,6 +63,7 @@ public class AccessTokenCheckFilter extends OncePerRequestFilter {
         try {
             Map<String, Object> claims = jwtUtil.validateToken(tokenBody);
             request.setAttribute("userEmail", claims.get("email").toString());
+            request.setAttribute("role", claims.get("role").toString());
         } catch (MalformedJwtException malformedJwtException) {
             log.info("===================================MalformedJwtException===================================");
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.MALFORM);
