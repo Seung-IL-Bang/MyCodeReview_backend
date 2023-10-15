@@ -5,6 +5,7 @@ import com.web.app.domain.board.Board;
 import com.web.app.dto.ReviewListDTO;
 import com.web.app.dto.ReviewResponseDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -20,9 +21,11 @@ public class Review extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(min = 1, max = 50, message = "부제목은 필수이며 50자를 초과해선 안됩니다.")
     @Column(length = 50, nullable = false)
     private String subTitle;
 
+    @Size(min = 1, max = 3000, message = "본문의 내용은 필수이며 3000자를 초과해선 안됩니다.")
     @Column(length = 3000, nullable = false)
     private String content;
 
