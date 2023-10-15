@@ -12,12 +12,14 @@ import com.web.app.repository.CommentRepository;
 import com.web.app.repository.LikesRepository;
 import com.web.app.repository.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -34,6 +36,15 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Long register(HttpServletRequest request, Review review, Long boardId) {
 
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Review>> violations = validator.validate(review);
+
+        if (!violations.isEmpty()) { // 유효성 검사 실패 시 처리; 예외 던지기, 오류 메시지 반환 등
+            List<ConstraintViolation<Review>> violationsList = new ArrayList<>(violations);
+            throw new ValidationException(violationsList.get(0).getMessage());
+        }
+
         Board board = boardRepository.findById(boardId).orElseThrow();
 
         String requestEmail = (String) request.getAttribute("userEmail");
@@ -49,16 +60,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewResponseDTO read(Long id, HttpServletRequest request) {
+    public ReviewResponseDTO read(Long id, String requestEmail) {
 
         Review findReview = reviewRepository.findById(id).orElseThrow();
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(findReview.getBoard());
 
         List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(findReview.getBoard());
-
-        Object userEmail = request.getAttribute("userEmail");
-        String requestEmail = userEmail == null ? "" : userEmail.toString();
 
         List<Long> liked;
         if (requestEmail.isBlank()) {
@@ -94,6 +102,17 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Review modify(HttpServletRequest request, ReviewRequestDTO reviewRequestDTO , Long id) {
 
+        Review newReview = modelMapper.map(reviewRequestDTO, Review.class);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Review>> violations = validator.validate(newReview);
+
+        if (!violations.isEmpty()) { // 유효성 검사 실패 시 처리; 예외 던지기, 오류 메시지 반환 등
+            List<ConstraintViolation<Review>> violationsList = new ArrayList<>(violations);
+            throw new ValidationException(violationsList.get(0).getMessage());
+        }
+
         Review findOne = reviewRepository.findById(id).orElseThrow();
 
         String requestEmail = (String) request.getAttribute("userEmail");
@@ -102,7 +121,8 @@ public class ReviewServiceImpl implements ReviewService {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
-        findOne.change(reviewRequestDTO.getSubTitle(), reviewRequestDTO.getContent()); // dirty check ? => not
+
+        findOne.change(newReview.getSubTitle(), newReview.getContent()); // dirty check ? => not
 
         reviewRepository.save(findOne);
 

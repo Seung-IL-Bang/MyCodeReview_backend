@@ -2,7 +2,7 @@ package com.web.app.util;
 
 import com.web.app.domain.board.Board;
 import com.web.app.fixture.BoardFixtureFactory;
-import com.web.app.repository.bulk.BoardPostRepository;
+import com.web.app.repository.bulk.DummyDataRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import java.util.stream.LongStream;
 public class BoardBulkInsertTest {
 
     @Autowired
-    private BoardPostRepository boardPostRepository;
+    private DummyDataRepository dummyDataRepository;
 
     @DisplayName("임의의 게시글 벌크 인서트 쿼리를 요청할 수 있다.")
     @Test
@@ -40,7 +40,7 @@ public class BoardBulkInsertTest {
         StopWatch queryStopWatch = new StopWatch();
         queryStopWatch.start();
 
-        boardPostRepository.bulkInsert(boards);
+        dummyDataRepository.bulkInsert(boards);
 
         queryStopWatch.stop();
         System.out.println(">>> 벌크 인서트 쿼리 시간: " + queryStopWatch.getTotalTimeSeconds());

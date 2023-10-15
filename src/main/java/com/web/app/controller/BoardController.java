@@ -2,6 +2,7 @@ package com.web.app.controller;
 
 import com.web.app.domain.board.Board;
 import com.web.app.dto.*;
+import com.web.app.proxy.GetEmailFromJWT;
 import com.web.app.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -17,12 +18,15 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
 
     private final BoardService boardService;
+    private final GetEmailFromJWT getEmailFromJWT;
 
     // 게시글 개별 상세 조회
     @GetMapping("/board/{id}")
     public ResponseEntity getBoard(@PathVariable("id") @Positive Long id, HttpServletRequest request) {
 
-        BoardResponseDTO response = boardService.read(id, request);
+        String requestEmail = getEmailFromJWT.execute(request);
+
+        BoardResponseDTO response = boardService.read(id, requestEmail);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

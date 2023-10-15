@@ -3,6 +3,7 @@ package com.web.app.controller;
 import com.web.app.domain.review.Review;
 import com.web.app.dto.ReviewRequestDTO;
 import com.web.app.dto.ReviewResponseDTO;
+import com.web.app.proxy.GetEmailFromJWT;
 import com.web.app.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,11 +20,15 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     private final ModelMapper modelMapper;
-    
+
+    private final GetEmailFromJWT getEmailFromJWT;
+
     @GetMapping("/board/review/{id}")
     public ResponseEntity getReview(@PathVariable("id") @Positive Long id, HttpServletRequest request) {
 
-        ReviewResponseDTO response = reviewService.read(id, request);
+        String requestEmail = getEmailFromJWT.execute(request);
+
+        ReviewResponseDTO response = reviewService.read(id, requestEmail);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

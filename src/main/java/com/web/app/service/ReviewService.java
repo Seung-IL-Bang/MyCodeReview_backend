@@ -9,7 +9,7 @@ public interface ReviewService {
 
     Long register(HttpServletRequest request, Review review, Long boardId);
 
-    ReviewResponseDTO read(Long id, HttpServletRequest request);
+    ReviewResponseDTO read(Long id, String requestEmail);
 
 
     Review modify(HttpServletRequest request, ReviewRequestDTO reviewRequestDTO , Long id);
