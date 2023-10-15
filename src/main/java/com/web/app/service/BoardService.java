@@ -14,7 +14,7 @@ public interface BoardService {
 
     void remove(HttpServletRequest request, Long id);
 
-    BoardResponseDTO read(Long id, HttpServletRequest request);
+    BoardResponseDTO read(Long id, String requestEmail);
 
     PageResponseDTO<BoardResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO);
 

@@ -51,10 +51,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponseDTO read(Long id, HttpServletRequest request) {
-
-        Object userEmail = request.getAttribute("userEmail");
-        String requestEmail = userEmail == null ? "" : userEmail.toString();
+    public BoardResponseDTO read(Long id, String requestEmail) {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> {
             throw new NoSuchElementException("해당 게시글은 존재하지 않습니다.");
