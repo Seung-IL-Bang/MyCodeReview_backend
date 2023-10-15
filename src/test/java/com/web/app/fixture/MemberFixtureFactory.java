@@ -1,6 +1,7 @@
 package com.web.app.fixture;
 
 import com.web.app.domain.member.Member;
+import com.web.app.util.EmailRandomizer;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
 import org.jeasy.random.FieldPredicates;
@@ -10,6 +11,7 @@ public class MemberFixtureFactory {
     public static Member create() {
         EasyRandomParameters param = new EasyRandomParameters();
         param.stringLengthRange(3, 10);
+        param.randomize(FieldPredicates.named("email"), new EmailRandomizer());
         return new EasyRandom(param).nextObject(Member.class);
     }
 

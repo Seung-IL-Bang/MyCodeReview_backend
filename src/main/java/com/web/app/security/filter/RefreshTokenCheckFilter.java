@@ -31,16 +31,17 @@ public class RefreshTokenCheckFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("===================================Refresh Token Check Filter=====================================");
 
         String path = request.getRequestURI();
 
         if (!path.equals(refreshPath)) { // 요청 URI 가 refreshPath 와 같지 않으면, refreshToken 에 대해 유효 검사 진행하지 않음.
-            log.info("========================= Skip Refresh Token Check Filter ============================");
+            log.info("===================================Skip Refresh Token Check Filter===================================");
             filterChain.doFilter(request, response);
             return;
         }
 
-        log.info("========================= Run Refresh Token Check Filter ===========================");
+        log.info("=================================Run Refresh Token=================================");
 
         Map<String, String> tokens = parseRequestJSON(request);
 
@@ -63,7 +64,7 @@ public class RefreshTokenCheckFilter extends OncePerRequestFilter {
             String accessToken = jwtUtil.generateToken(Map.of("email", email, "role", role), 1);
 
             if (getTime < (1000 * 60 * 60 * 24 * 3)) { // refreshToken 만료기간이 3일 이하라면
-                log.info("--------------------- Refresh Token Update -----------------------");
+                log.info("===================================Refresh Token Update===================================");
                 refreshToken = jwtUtil.generateToken(Map.of("email", email, "role", role), 30);
             }
 

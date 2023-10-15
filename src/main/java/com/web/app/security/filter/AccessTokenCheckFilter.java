@@ -1,6 +1,5 @@
 package com.web.app.security.filter;
 
-import com.web.app.security.auth.CustomOAuth2UserService;
 import com.web.app.security.exception.AccessTokenException;
 import com.web.app.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,22 +24,23 @@ public class AccessTokenCheckFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("=================================== Access Token Check Filter =====================================");
+        log.info("===================================Access Token Check Filter=====================================");
 
         String path = request.getRequestURI();
 
         if (!path.startsWith("/auth")) {
-            log.info("=================================== Skip Access Token Check Filter =================================");
+            log.info("===================================Skip Access Token Check Filter=================================");
             filterChain.doFilter(request, response);
             return;
         }
 
         // '/auth/**' 모든 경로에 대해 액세스 토큰 유효성 검사
         try {
+            log.info("===================================Run Validate AccessToken===================================");
             validateAccessToken(request); // Access Token 유효성 검증
             filterChain.doFilter(request, response);
         } catch (AccessTokenException accessTokenException) {
-            log.info("----------------- AccessToken Exception -----------------");
+            log.info("=================================AccessToken Exception=================================");
             accessTokenException.sendResponseError(response);
         }
     }
@@ -63,14 +63,15 @@ public class AccessTokenCheckFilter extends OncePerRequestFilter {
         try {
             Map<String, Object> claims = jwtUtil.validateToken(tokenBody);
             request.setAttribute("userEmail", claims.get("email").toString());
+            request.setAttribute("role", claims.get("role").toString());
         } catch (MalformedJwtException malformedJwtException) {
-            log.info("MalformedJwtException---------------------------------------");
+            log.info("===================================MalformedJwtException===================================");
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.MALFORM);
         } catch (SignatureException signatureException) {
-            log.info("SignatureException------------------------------------------");
+            log.info("===================================SignatureException===================================");
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.BADSIGN);
         } catch (ExpiredJwtException expiredJwtException) {
-            log.info("ExpiredJwtException-----------------------------------------");
+            log.info("===================================ExpiredJwtException===================================");
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.EXPIRED);
         }
     }

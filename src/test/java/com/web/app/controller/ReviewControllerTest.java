@@ -13,7 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -27,14 +27,12 @@ class ReviewControllerTest extends ControllerTestSupport {
     @WithMockUser
     void getReview() throws Exception {
         //given
-        Long reviewId = any(Long.class);
-
         ReviewResponseDTO reviewResponseDTO = ReviewFixtureFactory.createResponseDTO();
-
-        given(reviewService.read(reviewId, any(HttpServletRequest.class))).willReturn(reviewResponseDTO);
+        given(getEmailFromJWT.execute(any(HttpServletRequest.class))).willReturn(reviewResponseDTO.getEmail());
+        given(reviewService.read(anyLong(), anyString())).willReturn(reviewResponseDTO);
 
         // when // then
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/review/%d", reviewId))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/review/%d", reviewResponseDTO.getId()))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())

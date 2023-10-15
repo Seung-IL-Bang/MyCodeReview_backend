@@ -46,10 +46,8 @@ class ReviewServiceTest extends IntegrationTestSupport {
                 .build();
         Review savedReview = reviewRepository.save(review);
 
-        MockHttpServletRequest requestWithJWT = getRequestWithJWT(board.getWriter(), board.getEmail());
-
         // when
-        ReviewResponseDTO read = reviewService.read(savedReview.getId(), requestWithJWT);
+        ReviewResponseDTO read = reviewService.read(savedReview.getId(), savedBoard.getEmail());
 
         // then
         assertThat(read.getContent()).isEqualTo(review.getContent());

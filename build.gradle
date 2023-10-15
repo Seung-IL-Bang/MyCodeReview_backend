@@ -12,7 +12,7 @@ plugins {
 }
 
 group = 'com.web'
-version = '1.1.1-SNAPSHOT'
+version = '1.1.2-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
@@ -92,6 +92,7 @@ dependencies {
 
 	// EasyRandom
 	testImplementation 'org.jeasy:easy-random-core:5.0.0'
+	implementation 'org.jeasy:easy-random-core:5.0.0'
 
 	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'

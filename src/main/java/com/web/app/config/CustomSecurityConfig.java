@@ -34,7 +34,7 @@ public class CustomSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        log.info("================================= filterChain Configuration ================================");
+        log.info("=================================filterChain Configuration================================");
 
         // formLogin 비활성화
         http.formLogin(AbstractHttpConfigurer::disable);
@@ -62,7 +62,7 @@ public class CustomSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        log.info("--------------------------------Web Configure--------------------------------");
+        log.info("=================================Web Configure=================================");
 
         return (web -> web.ignoring().requestMatchers(
                 PathRequest
@@ -72,17 +72,19 @@ public class CustomSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.info("=================================PasswordEncoder=================================");
         return new BCryptPasswordEncoder(); // 해시 알고리즘으로 패스워드 암호화; 같은 문자열이라도 매번 해시 처리된 결과가 다르다.
     }
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        log.info("=================================AuthenticationSuccessHandler=================================");
         return new CustomSocialLoginSuccessHandler(jwtUtil);
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
+        log.info("=================================CorsConfigurationSource=================================");
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));

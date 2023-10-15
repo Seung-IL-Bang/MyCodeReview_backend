@@ -2,6 +2,7 @@ package com.web.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.app.controller.*;
+import com.web.app.proxy.GetEmailFromJWT;
 import com.web.app.proxy.LikesUseCase;
 import com.web.app.service.*;
 import org.modelmapper.ModelMapper;
@@ -16,7 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
         LikesController.class,
         MemberController.class,
         ReplyController.class,
-        ReviewController.class
+        ReviewController.class,
+        AdminController.class
 })
 public abstract class ControllerTestSupport {
 
@@ -30,6 +32,9 @@ public abstract class ControllerTestSupport {
     // MemberController, ReviewController
     @MockBean
     protected ModelMapper modelMapper;
+
+    @MockBean
+    protected GetEmailFromJWT getEmailFromJWT;
 
     // BoardController
     @MockBean
@@ -55,5 +60,7 @@ public abstract class ControllerTestSupport {
     @MockBean
     protected ReviewService reviewService;
 
-
+    // AdminController
+    @MockBean
+    protected AdminService adminService;
 }
