@@ -34,7 +34,8 @@ class BoardControllerTest extends ControllerTestSupport {
     void getBoard() throws Exception {
         //given
         BoardResponseDTO boardResponseDTO = BoardFixtureFactory.createResponseDTO();
-        given(boardService.read(anyLong(), any(HttpServletRequest.class))).willReturn(boardResponseDTO);
+        given(getEmailFromJWT.execute(any(HttpServletRequest.class))).willReturn(boardResponseDTO.getEmail());
+        given(boardService.read(anyLong(), anyString())).willReturn(boardResponseDTO);
 
         // when // then
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/board/%d", boardResponseDTO.getId()))
