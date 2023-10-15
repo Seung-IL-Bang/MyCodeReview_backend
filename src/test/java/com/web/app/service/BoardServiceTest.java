@@ -88,11 +88,9 @@ public class BoardServiceTest extends IntegrationTestSupport {
         Member member = MemberFixtureFactory.create();
 
         Long id = boardRepository.save(board).getId();
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
-        mockHttpServletRequest.setAttribute("userEmail", member.getEmail());
 
         // when
-        BoardResponseDTO read = boardService.read(id, mockHttpServletRequest);
+        BoardResponseDTO read = boardService.read(id, member.getEmail());
 
         // then
         assertThat(read.getId()).isEqualTo(id);
@@ -134,12 +132,11 @@ public class BoardServiceTest extends IntegrationTestSupport {
         MockHttpServletRequest request = getRequestWithJWT(board.getWriter(), board.getEmail());
         request.setAttribute("userEmail", board.getEmail());
 
-
         // when
         boardService.remove(request, id);
 
         // then
-        assertThatThrownBy(() -> boardService.read(id, request))
+        assertThatThrownBy(() -> boardService.read(id, board.getEmail()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("해당 게시글은 존재하지 않습니다.");
     }
@@ -172,7 +169,7 @@ public class BoardServiceTest extends IntegrationTestSupport {
         boardService.remove(request, id);
 
         // then
-        assertThatThrownBy(() -> boardService.read(id, request))
+        assertThatThrownBy(() -> boardService.read(id, board.getEmail()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("해당 게시글은 존재하지 않습니다.");
     }
