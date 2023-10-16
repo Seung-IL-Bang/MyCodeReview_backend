@@ -25,7 +25,16 @@
 <details>
   <summary>📂 Version History</summary>
 
-  ### [Version-1.1.0 [23.10.08] [latest]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/26)
+  ### [Version-1.1.2 [23.10.16] [latest]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/37)
+  - Dummy Data 추가 기능
+  - Review 작성 및 수정 시 엔티티 검증 추가
+  - Board 단일 조회시 작성자 식별 불가능 오류 수정
+
+  ### [Version-1.1.1 [23.10.13]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/30)
+  - 좋아요 기능에 대한 테스트 코드 수정 및 추가 & Swagger info 수정
+  - @entitygraph 추가 & 중복되는 JWT 검증 로직 제거
+
+  ### [Version-1.1.0 [23.10.08]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/26)
   - Redis 캐싱 레이어 도입
   - 벌크 인서트 쿼리 추가
   - @Batchsize 적용
@@ -42,6 +51,7 @@
 ## Description
 
 🔎 목차
+  - [성능 테스트를 위한 Dummy Data 벌크 인서트](#성능-테스트를-위한-dummy-data-벌크-인서트)
   - [단위 테스트 작성 & 테스트 환경 최적화](#단위-테스트-작성--테스트-환경-최적화)
   - [AWS Pipeline & Nginx를 활용한 무중단 배포](#aws-pipeline--nginx를-활용한-무중단-배포)
   - [N+1 문제 해결](#n1-문제-해결)
@@ -50,6 +60,27 @@
   - [Swagger를 사용한 API 문서화](#swagger를-사용한-api-문서화)
 
 ---
+
+## 성능 테스트를 위한 Dummy Data 벌크 인서트
+
+- 실제 배포환경에서 애플리케이션의 성능 테스트를 위해 DB에 어느 정도 dummy data가 필요했습니다.
+- dummy data를 DB에 저장하기 위해 EasyRandom 라이브러리를 이용해서 객체들을 쉽게 생성했습니다.
+- JPA에서는 수 많은 쿼리를 한 번에 보내주는 벌크 인서트 쿼리 기능을 지원하지 않아서 JDBC를 사용하여 벌크 인서트 쿼리를 구현했습니다.
+- 일반 사용자가 배포환경에서 벌크 인서트 API를 호출하면 안 되기 때문에, ADMIN 권한을 가진 계정만 호출 할 수 있도록 로직을 구현했습니다.
+  
+<img width="1094" alt="bulkinsert" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/9e5e86d0-04e2-4408-a4aa-dbdb7b0c80ba">
+
+- 아래 이미지는 벌크 인서트 쿼리의 API를 테스트하는 `Swagger UI` 입니다.
+- Parameters들을 조절해가면서 적절한 Dummy Data 양을 DB에 저장할 수 있습니다.
+- 주의해야 할 점은 너무 많은 양의 데이터를 한 번에 시도하면 문제가 발생할 수 있습니다. 발생 가능한 문제로는 두 가지가 있습니다.
+  - `Heap Space Out Of Memory`: 더미 데이터를 대량으로 삽입하려고 할 때, 한 번에 너무 많은 객체가 생성되어 힙 메모리를 초과하는 경우 힙 메모리 부족 문제가 발생할 수 있습니다.
+  - `504 Gateway Time-Out`: 서버가 요청을 처리하는 데 필요한 시간이 너무 길어서 게이트웨이나 프록시가 시간 초과로 응답을 중단할 수 있습니다.
+
+<p align="center">
+  <img width="608" alt="bulkswagger" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/7e31e9ed-7c28-4fbf-a520-60ba9c560d05">
+</p>
+
+<br/>
 
 ## 단위 테스트 작성 & 테스트 환경 최적화
 
@@ -88,6 +119,8 @@
 - AWS Pipeline은 [Github 소스 - CodeBuild - CodeDeploy]로 구성되며 새롭게 추가된 코드를 자동으로 EC2 인스턴스에 배포할 수 있도록 도와주는 CI/CD 파이프라인입니다.
 - Nginx를 사용하여 현재 사용하고 있는 애플리케이션과 IDLE(휴식) 애플리케이션을 교차 사용해가면서 Nginx Reload를 통해 서버가 무중단 배포될 수 있도록 구현했습니다.
 
+<br/>
+
 ## N+1 문제 해결
 [N+1 문제에 대한 탐구 정리글](https://devlog-seung-il-bang.vercel.app/orm-jpa-n+1-problem)
 - 사용자 본인의 게시물 목록을 조회해오는 로직에서 게시물들의 태그 목록들을 집계하는 순간 N+1 문제가 발생하는 것을 발견했습니다.
@@ -99,6 +132,8 @@
 - 다른 해결 방법으로는 `@EntityGroup`과 `Fetch Join` 등이 있었습니다.
 - 둘 다 효과적으로 N+1 문제를 해결 할 수 있지만, 사용성이 더 편한 `@EntityGroup` 방법을 사용하기로 결정했습니다.
 - `@EntityGroup` 사용으로 필요한 연관 엔티티만 Eager Loading 방식으로 로드할 수 있었고 덕분에 N+1 문제도 해결할 수 있었습니다.
+
+<br/>
 
 ## 낙관적 락을 이용한 좋아요 기능 동시성 제어
 - 게시글의 좋아요 기능은 동시다발적인 요청이 발생 가능하기 때문에 동시성 이슈로 인해 데이터 정합성이 깨질 우려가 있습니다.
@@ -129,6 +164,8 @@
 
 <img width="489" alt="동시성 테스트 통과" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/7851a40d-9e36-4631-85a2-a0ad6df44821">
 
+<br/>
+
 ## QueryDSL을 이용한 동적 쿼리 처리
 - 제목, 태그, 난이도 등을 조합한 검색을 위해 사용자의 입력값에 따라 쿼리의 조건이 바뀌는 동적 쿼리를 QueryDSL을 통해 구현했습니다.
 - QueryDSL 사용으로 다음과 같은 장점을 얻을 수 있었습니다.
@@ -136,6 +173,8 @@
   2. 코드 자동완성: IDE에서 지원하는 필드 또는 메서드에 대해 자동완성을 지원받아, 개발 생산성을 높일 수 있었습니다.
   3. 동적 쿼리 작성 용이성: 조건이 바뀌는 동적 쿼리를 쉽고 간결하게 작성할 수 있었습니다.
   4. 유지 보수: 쿼리를 Java 코드로 작성하기 때문에 쉽게 유지보수할 수 있었습니다.
+
+<br/>
 
 ## Swagger를 사용한 API 문서화
 - 예전에 진행했던 팀프로젝트의 경우 초기에 API 문서를 수동으로 관리했었습니다. 수동으로 관리하게 되면 기능의 추가나 수정이 생겼을 경우 매번 API 문서도 직접 수정해야 했습니다. 반복적인 수정 작업은 비효율적이며 실수가 생길 가능성이 컸습니다.
