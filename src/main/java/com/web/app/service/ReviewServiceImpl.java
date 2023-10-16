@@ -2,15 +2,10 @@ package com.web.app.service;
 
 import com.web.app.domain.board.Board;
 import com.web.app.domain.comment.Comment;
+import com.web.app.domain.reply.Reply;
 import com.web.app.domain.review.Review;
-import com.web.app.dto.CommentResponseDTO;
-import com.web.app.dto.ReviewListDTO;
-import com.web.app.dto.ReviewRequestDTO;
-import com.web.app.dto.ReviewResponseDTO;
-import com.web.app.repository.BoardRepository;
-import com.web.app.repository.CommentRepository;
-import com.web.app.repository.LikesRepository;
-import com.web.app.repository.ReviewRepository;
+import com.web.app.dto.*;
+import com.web.app.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +26,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
     private final LikesRepository likesRepository;
+    private final ReplyRepository replyRepository;
 
 
     @Override
@@ -78,6 +74,17 @@ public class ReviewServiceImpl implements ReviewService {
         List<CommentResponseDTO> commentListDTO = comments.stream()
                 .map(comment -> new CommentResponseDTO(comment, requestEmail))
                 .collect(Collectors.toList());
+
+        commentListDTO.stream()
+                .forEach(commentResponseDTO -> {
+                    Long replyId = commentResponseDTO.getId();
+                    List<Reply> findList = replyRepository.findAllByComment_IdOrderByCreatedAtAsc(replyId);
+                    List<ReplyResponseDTO> replyListDTO = findList.stream().map(reply -> new ReplyResponseDTO(reply, requestEmail))
+                            .collect(Collectors.toList());
+
+                    commentResponseDTO.setRepliesCount(findList.size());
+                    commentResponseDTO.setReplies(replyListDTO);
+                });
 
         List<ReviewListDTO> reviewListDTOS = reviews.stream()
                 .map(review -> modelMapper.map(review, ReviewListDTO.class))

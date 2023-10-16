@@ -8,7 +8,10 @@ public interface AdminService {
     ApiResponse<Object> testAdminAuthority(HttpServletRequest request);
 
     ApiResponse<Object> bulkInsertDummyData(HttpServletRequest request,
-                                            Long numberOfBoards,
                                             Long numberOfMembers,
-                                            Long numberOfComments);
+                                            Long numberOfBoards,
+                                            Long numberOfReviews,
+                                            Long numberOfComments,
+                                            Long numberOfReplies,
+                                            Long numberOfLikes);
 }
