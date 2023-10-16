@@ -1,7 +1,9 @@
 package com.web.app.util;
 
 import com.web.app.domain.board.Board;
+import com.web.app.domain.member.Member;
 import com.web.app.fixture.BoardFixtureFactory;
+import com.web.app.fixture.MemberFixtureFactory;
 import com.web.app.repository.bulk.DummyDataRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -34,13 +36,18 @@ public class BoardBulkInsertTest {
                 .mapToObj(BoardFixtureFactory::create)
                 .toList();
 
+        List<Member> members = LongStream.range(0, 500)
+                .parallel()
+                .mapToObj(MemberFixtureFactory::create)
+                .toList();
+
         stopWatch.stop();
         System.out.println(">>> 임의 객체 생성 시간: " + stopWatch.getTotalTimeSeconds());
 
         StopWatch queryStopWatch = new StopWatch();
         queryStopWatch.start();
 
-        dummyDataRepository.bulkInsert(boards);
+        dummyDataRepository.bulkInsertForBoard(boards, members);
 
         queryStopWatch.stop();
         System.out.println(">>> 벌크 인서트 쿼리 시간: " + queryStopWatch.getTotalTimeSeconds());

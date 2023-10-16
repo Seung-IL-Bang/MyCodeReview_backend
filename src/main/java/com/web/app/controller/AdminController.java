@@ -24,11 +24,21 @@ public class AdminController {
     }
 
     @PostMapping("/auth/admin/bulk-insert")
-    public ResponseEntity postBulkBoards(HttpServletRequest request,
-                                         @Positive @RequestParam("numberOfBoards") Long numberOfBoards,
+    public ResponseEntity bulkInsertDummyData(HttpServletRequest request,
                                          @Positive @RequestParam("numberOfMembers") Long numberOfMembers,
-                                         @Positive @RequestParam("numberOfComments") Long numberOfComments) {
-        ApiResponse<Object> response = adminService.bulkInsertDummyData(request, numberOfBoards, numberOfMembers, numberOfComments);
+                                         @Positive @RequestParam("numberOfBoards") Long numberOfBoards,
+                                         @Positive @RequestParam("numberOfReviews") Long numberOfReviews,
+                                         @Positive @RequestParam("numberOfComments") Long numberOfComments,
+                                         @Positive @RequestParam("numberOfReplies") Long numberOfReplies,
+                                         @Positive @RequestParam("numberOfLikes") Long numberOfLikes) {
+        ApiResponse<Object> response = adminService.bulkInsertDummyData(
+                request,
+                numberOfMembers,
+                numberOfBoards,
+                numberOfReviews,
+                numberOfComments,
+                numberOfReplies,
+                numberOfLikes);
         return new ResponseEntity(response.getData(), response.getStatus());
     }
 }
