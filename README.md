@@ -78,7 +78,7 @@
   - `504 Gateway Time-Out`: 서버가 요청을 처리하는 데 필요한 시간이 너무 길어서 게이트웨이나 프록시가 시간 초과로 응답을 중단할 수 있습니다.
 
 <p align="center">
-  <img width="608" alt="bulkswagger" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/7e31e9ed-7c28-4fbf-a520-60ba9c560d05">
+  <img width="500" height="500" alt="bulkswagger" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/7e31e9ed-7c28-4fbf-a520-60ba9c560d05">
 </p>
 
 <br/>
@@ -102,7 +102,9 @@
   4. 결과 비교
      - 인덱스 생성 전후의 성능 측정 결과를 비교하여 성능 향상을 평가합니다.
 
-    
+<img width="2030" alt="index" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/e879d160-214c-41e8-ab5f-0ba886e2acfd">
+
+
 
 
 
