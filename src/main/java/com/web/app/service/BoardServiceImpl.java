@@ -220,27 +220,21 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-//    @Cacheable(cacheNames = "readPublicAll", key = "#pageRequestDTO.page")
     public PageResponseDTO<BoardResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("createdAt");
 
-        Page<Board> boards = boardRepository.searchPublicAll(
+        PageImplDeSerializeDTO<BoardResponseDTO> boards = boardRepository.searchPublicAll(
                 pageRequestDTO.getTypes(),
                 pageRequestDTO.getKeyword(),
                 pageRequestDTO.getDifficulties(),
                 pageRequestDTO.getTag(),
                 pageable);
 
-        List<BoardResponseDTO> dtoList = boards.getContent().stream()
-                .map(board -> modelMapper.map(board, BoardResponseDTO.class))
-                .collect(Collectors.toList());
-
-
         return PageResponseDTO.<BoardResponseDTO>builder()
                 .pageRequestDTO(pageRequestDTO)
-                .dtoList(dtoList)
-                .total((int) boards.getTotalElements())
+                .dtoList(boards.getList())
+                .total(boards.getTotal()) // count(board_id)
                 .build();
     }
 
