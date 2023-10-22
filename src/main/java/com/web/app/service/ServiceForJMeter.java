@@ -1,6 +1,8 @@
 package com.web.app.service;
 
 import com.web.app.domain.board.Board;
+import com.web.app.dto.BoardResponseDTO;
+import com.web.app.dto.PageImplDeSerializeDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.repository.BoardRepository;
 import com.web.app.repository.LikesRepository;
@@ -42,15 +44,15 @@ public class ServiceForJMeter {
         return likesRepository.isLiked(boardId, email);
     }
 
-    public List<Board> searchPublicAll(PageRequestDTO pageRequestDTO) {
+    public List<BoardResponseDTO> searchPublicAll(PageRequestDTO pageRequestDTO) {
 
-        Page<Board> boards = boardSearch.searchPublicAll(
+        PageImplDeSerializeDTO<BoardResponseDTO> boards = boardSearch.searchPublicAll(
                 pageRequestDTO.getTypes(),
                 pageRequestDTO.getKeyword(),
                 pageRequestDTO.getDifficulties(),
                 pageRequestDTO.getTag(),
                 pageRequestDTO.getPageable());
-        return boards.getContent();
+        return boards.getList();
     }
 
     public List<Board> searchAll(PageRequestDTO pageRequestDTO, HttpServletRequest request) {
