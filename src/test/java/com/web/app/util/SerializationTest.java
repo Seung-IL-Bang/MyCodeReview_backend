@@ -87,8 +87,8 @@ public class SerializationTest extends IntegrationTestSupport {
                 .hasRootCauseInstanceOf(LazyInitializationException.class);
     }
 
-    @DisplayName("Redis에 정상적으로 직렬화 및 역직렬화를 수행할 수 있다.")
-    @Transactional(readOnly = true)
+    @DisplayName("Redis 캐싱하는 과정에서 정상적으로 직렬화 및 역직렬화를 수행할 수 있다.")
+    @Transactional(readOnly = true) // Hibernate 세션이 종료되기 전에 연관관계 필드에 접근할 수 있도록 해준다.
     @Test
     public void RedisSerializationTest() {
         // given
@@ -99,10 +99,9 @@ public class SerializationTest extends IntegrationTestSupport {
         ValueOperations<String, byte[]> ops = redisTemplate.opsForValue();
 
         // when
-        /*Start Transaction*/
         Board board = boardRepository.findById(savedBoard.getId()).orElseThrow();
         BoardResponseDTO boardDTO = BoardResponseDTO.of(board);
-        /*End Transaction*/ // 연관 관계의 필드를 즉시 로딩 하더라도 Entity를 DTO로 변환할 때 까지 트랜잭션으로 묶여 있어야지 LazyInitializationException 예외가 발생하지 않는다.
+
 
         ops.set(redisKey, serializer.serialize(boardDTO));
 
