@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,8 +29,6 @@ public class BoardServiceImpl implements BoardService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
-
-    private final CachingService cachingService;
 
 
     @Override
