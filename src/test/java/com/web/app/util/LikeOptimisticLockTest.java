@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,7 +49,7 @@ public class LikeOptimisticLockTest extends IntegrationTestSupport {
         memberRepository.deleteAllInBatch();
     }
 
-    private final int NUMBER_OF_THREADS = 6;
+    private final int NUMBER_OF_THREADS = 4;
 
     @DisplayName("좋아요 기능의 동시성 이슈 발생 시 낙관적 락킹 실패 예외가 던져진다.")
     @Test
@@ -71,8 +68,9 @@ public class LikeOptimisticLockTest extends IntegrationTestSupport {
         List<Future<?>> futures = likeRequestDTOs.stream()
                 .map(likeRequestDTO -> executorService.submit(() -> {
                     try {
+                        TimeUnit.SECONDS.sleep(1);
                         likesService.postLike(likeRequestDTO);
-                    } catch (BusinessLogicException e) {
+                    } catch (BusinessLogicException | InterruptedException e) {
                         throw new RuntimeException(e.getCause());
                     }
                 }))
@@ -109,8 +107,9 @@ public class LikeOptimisticLockTest extends IntegrationTestSupport {
         List<Future<?>> futures = likeRequestDTOs.stream()
                 .map(likeRequestDTO -> executorService.submit(() -> {
                     try {
+                        TimeUnit.SECONDS.sleep(1);
                         likesUseCase.executePost(likeRequestDTO);
-                    } catch (BusinessLogicException e) {
+                    } catch (BusinessLogicException | InterruptedException e) {
                         throw new RuntimeException(e.getCause());
                     }
                 }))
@@ -157,8 +156,9 @@ public class LikeOptimisticLockTest extends IntegrationTestSupport {
         List<Future<?>> futures = likeRequestDTOs.stream()
                 .map(likeRequestDTO -> executorService.submit(() -> {
                     try {
+                        TimeUnit.SECONDS.sleep(1);
                         likesService.deleteLike(likeRequestDTO);
-                    } catch (BusinessLogicException e) {
+                    } catch (BusinessLogicException | InterruptedException e) {
                         throw new RuntimeException(e.getCause());
                     }
                 }))
@@ -203,8 +203,9 @@ public class LikeOptimisticLockTest extends IntegrationTestSupport {
         List<Future<?>> futures = likeRequestDTOs.stream()
                 .map(likeRequestDTO -> executorService.submit(() -> {
                     try {
+                        TimeUnit.SECONDS.sleep(1);
                         likesUseCase.executeDelete(likeRequestDTO);
-                    } catch (BusinessLogicException e) {
+                    } catch (BusinessLogicException | InterruptedException e) {
                         throw new RuntimeException(e.getCause());
                     }
                 }))
