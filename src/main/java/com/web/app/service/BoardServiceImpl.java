@@ -69,19 +69,15 @@ public class BoardServiceImpl implements BoardService {
             liked = likesRepository.isLiked(id, requestEmail);
         }
 
-        List<ReviewListDTO> reviewsForBoard = cachingService.getReviewsForBoard(board);
-        List<CommentResponseDTO> commentsForBoard = cachingService.getCommentsForBoard(board);
-//        List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(board);
-//        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(board);
+        List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(board);
 
-//        List<CommentResponseDTO> commentListDTO = comments.stream()
-//                .map(comment -> new CommentResponseDTO(comment))
-//                .collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(board);
 
-        commentsForBoard.stream()
-                .forEach(commentResponseDTO -> commentResponseDTO.checkMyComment(requestEmail));
+        List<CommentResponseDTO> commentListDTO = comments.stream()
+                .map(comment -> new CommentResponseDTO(comment, requestEmail))
+                .collect(Collectors.toList());
 
-        commentsForBoard.stream()
+        commentListDTO.stream()
                 .forEach(commentResponseDTO -> {
                     Long replyId = commentResponseDTO.getId();
                     List<Reply> findList = replyRepository.findAllByComment_IdOrderByCreatedAtAsc(replyId);
@@ -93,9 +89,9 @@ public class BoardServiceImpl implements BoardService {
                 });
 
 
-//        List<ReviewListDTO> reviewListDTOS = reviews.stream()
-//                .map(review -> modelMapper.map(review, ReviewListDTO.class))
-//                .collect(Collectors.toList());
+        List<ReviewListDTO> reviewListDTOS = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewListDTO.class))
+                .collect(Collectors.toList());
 
         if (!board.getEmail().equals(requestEmail) || requestEmail.isBlank()) {
             dto.setMyBoard(false);
@@ -103,11 +99,11 @@ public class BoardServiceImpl implements BoardService {
             dto.setMyBoard(true);
         }
 
-        dto.setReviewList(reviewsForBoard);
+        dto.setReviewList(reviewListDTOS);
         dto.setLiked(!liked.isEmpty());
         dto.setLikeCount(board.getLikeCount());
-        dto.setCommentList(commentsForBoard);
-        dto.setCommentsCount(commentsForBoard.size());
+        dto.setCommentList(commentListDTO);
+        dto.setCommentsCount(commentListDTO.size());
 
         return dto;
     }

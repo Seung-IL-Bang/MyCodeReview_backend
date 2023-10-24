@@ -36,6 +36,20 @@ public class CommentResponseDTO {
         this.modifiedAt = comment.getModifiedAt();
     }
 
+    public CommentResponseDTO(Comment comment, String requestEmail) {
+        this.id = comment.getId();
+        this.content = comment.getContent();
+        this.memberName = comment.getMember().getName();
+        this.memberEmail = comment.getMember().getEmail();
+        this.modifiedAt = comment.getModifiedAt();
+
+        if (comment.getMember().getEmail().equals(requestEmail)) {
+            this.myComment = true;
+        } else {
+            this.myComment = false;
+        }
+    }
+
 
     public void checkMyComment(String requestEmail) {
         if (this.getMemberEmail().equals(requestEmail)) {
