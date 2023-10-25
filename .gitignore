@@ -12,6 +12,7 @@ application-localoauth.yml
 application-prodoauth.yml
 application-prod.yml
 src/main/generated
+jmxremote.*
 
 ### STS ###
 .apt_generated
