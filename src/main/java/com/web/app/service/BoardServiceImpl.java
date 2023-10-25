@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +29,7 @@ public class BoardServiceImpl implements BoardService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
+
 
     @Override
     public Long register(BoardRequestDTO boardRequestDTO) {
@@ -213,27 +213,21 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-//    @Cacheable(cacheNames = "readPublicAll", key = "#pageRequestDTO.page")
     public PageResponseDTO<BoardResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("createdAt");
 
-        Page<Board> boards = boardRepository.searchPublicAll(
+        PageImplDeSerializeDTO<BoardResponseDTO> boards = boardRepository.searchPublicAll(
                 pageRequestDTO.getTypes(),
                 pageRequestDTO.getKeyword(),
                 pageRequestDTO.getDifficulties(),
                 pageRequestDTO.getTag(),
                 pageable);
 
-        List<BoardResponseDTO> dtoList = boards.getContent().stream()
-                .map(board -> modelMapper.map(board, BoardResponseDTO.class))
-                .collect(Collectors.toList());
-
-
         return PageResponseDTO.<BoardResponseDTO>builder()
                 .pageRequestDTO(pageRequestDTO)
-                .dtoList(dtoList)
-                .total((int) boards.getTotalElements())
+                .dtoList(boards.getList())
+                .total(boards.getTotal()) // count(board_id)
                 .build();
     }
 

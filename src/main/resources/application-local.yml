@@ -20,6 +20,19 @@ spring:
       port: 6379
   cache:
     type: redis
+  # jmx
+  jmx:
+    enabled: true
+
+# 스프링 부트 액추에이터
+management:
+  endpoints:
+    enabled-by-default: false # 모두 비활성화
+  endpoint:
+    health:
+      enabled: true # health check 활성화
+    info:
+      enabled: # info 조회 활성화
 
 # 로그 레벨 설정
 logging:

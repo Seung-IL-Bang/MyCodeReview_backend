@@ -4,12 +4,17 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.board.QBoard;
+import com.web.app.dto.BoardResponseDTO;
+import com.web.app.dto.PageImplDeSerializeDTO;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardSearch {
 
@@ -61,10 +66,11 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     }
 
     @Override
-    public Page<Board> searchPublicAll(String[] types, String keyword, String[] difficulties, String tag, Pageable pageable) {
+    @Cacheable(value = "boards", key = "#types + '_' + #keyword + '_' + #difficulties + '_' + #tag + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
+    public PageImplDeSerializeDTO<BoardResponseDTO> searchPublicAll(String[] types, String keyword, String[] difficulties, String tag, Pageable pageable) {
         QBoard board = QBoard.board;
 
-        JPQLQuery<Board> query = from(board);
+        JPQLQuery<Board> query = from(board).leftJoin(board.tagList).fetchJoin();
 
 
         if ((types != null && types.length > 0)) { // 검색 조건과 키워드가 있다면
@@ -97,7 +103,17 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
         long count = query.fetchCount();
 
-        return new PageImpl<>(list, pageable, count);
+        PageImpl<Board> boardsPage = new PageImpl<>(list, pageable, count);
+
+        List<Board> boards = boardsPage.getContent();
+
+        List<BoardResponseDTO> dtoList = boards.stream()
+                .map(BoardResponseDTO::of)
+                .collect(Collectors.toList());
+
+        PageImplDeSerializeDTO<BoardResponseDTO> response = new PageImplDeSerializeDTO<>(dtoList, (int) boardsPage.getTotalElements());
+
+        return response;
     }
 
     @Override

@@ -22,9 +22,9 @@ public class CachingConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
 
-        RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
+        RedisCacheConfiguration defaultConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
-                .entryTtl(Duration.ofSeconds(10)) // 기본 TTL
+                .entryTtl(Duration.ofSeconds(60)) // 기본 TTL
                 .computePrefixWith(CacheKeyPrefix.simple())
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
@@ -33,12 +33,18 @@ public class CachingConfig {
                 );
 
         HashMap<String, RedisCacheConfiguration> configMap = new HashMap<>();
-//        configMap.put("userAgeCache", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(5))); // 특정 캐시에 대한 TTL
+        configMap.put("boards", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(5)) // 특정 캐시에 대한 TTL
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                .serializeKeysWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
+                ));
 
         return RedisCacheManager
                 .RedisCacheManagerBuilder
                 .fromConnectionFactory(connectionFactory)
-                .cacheDefaults(configuration)
+                .cacheDefaults(defaultConfiguration)
                 .withInitialCacheConfigurations(configMap)
                 .build();
     }

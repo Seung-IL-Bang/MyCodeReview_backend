@@ -1,5 +1,9 @@
 package com.web.app.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.web.app.domain.comment.Comment;
 import lombok.*;
 
@@ -20,6 +24,8 @@ public class CommentResponseDTO {
     private int repliesCount;
     private List<ReplyResponseDTO> replies;
     private boolean myComment;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedAt;
 
     public CommentResponseDTO(Comment comment) {
@@ -38,6 +44,15 @@ public class CommentResponseDTO {
         this.modifiedAt = comment.getModifiedAt();
 
         if (comment.getMember().getEmail().equals(requestEmail)) {
+            this.myComment = true;
+        } else {
+            this.myComment = false;
+        }
+    }
+
+
+    public void checkMyComment(String requestEmail) {
+        if (this.getMemberEmail().equals(requestEmail)) {
             this.myComment = true;
         } else {
             this.myComment = false;

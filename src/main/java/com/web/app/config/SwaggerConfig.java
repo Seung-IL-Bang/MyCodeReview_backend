@@ -15,7 +15,7 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
 
         Info info = new Info()
-                .version("v1.1.2")
+                .version("v1.1.3")
                 .title("My Code Review API Specification")
                 .description("Latest 23.10.15");
 
