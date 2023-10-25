@@ -12,7 +12,7 @@ plugins {
 }
 
 group = 'com.web'
-version = '1.1.2-SNAPSHOT'
+version = '1.1.3-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
@@ -96,6 +96,9 @@ dependencies {
 
 	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.1.5'
 
 }
 

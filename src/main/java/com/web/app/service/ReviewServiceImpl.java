@@ -28,6 +28,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final LikesRepository likesRepository;
     private final ReplyRepository replyRepository;
 
+    private final CachingService cachingService;
+
 
     @Override
     public Long register(HttpServletRequest request, Review review, Long boardId) {
@@ -62,7 +64,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         List<Review> reviews = reviewRepository.findAllByBoardIsOrderByIdDesc(findReview.getBoard());
 
-        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(findReview.getBoard());
+//        List<Comment> comments = commentRepository.findAllByBoardIsOrderByCreatedAtAsc(findReview.getBoard());
 
         List<Long> liked;
         if (requestEmail.isBlank()) {
@@ -71,11 +73,19 @@ public class ReviewServiceImpl implements ReviewService {
             liked = likesRepository.isLiked(findReview.getBoard().getId(), requestEmail);
         }
 
-        List<CommentResponseDTO> commentListDTO = comments.stream()
-                .map(comment -> new CommentResponseDTO(comment, requestEmail))
-                .collect(Collectors.toList());
 
-        commentListDTO.stream()
+        List<CommentResponseDTO> commentsForBoard = cachingService.getCommentsForBoard(findReview.getBoard());
+
+//        List<CommentResponseDTO> commentListDTO = comments.stream()
+//                .map(comment -> new CommentResponseDTO(comment, requestEmail))
+//                .collect(Collectors.toList());
+
+        commentsForBoard.stream()
+                        .forEach(commentResponseDTO -> commentResponseDTO.checkMyComment(requestEmail));
+
+
+
+        commentsForBoard.stream()
                 .forEach(commentResponseDTO -> {
                     Long replyId = commentResponseDTO.getId();
                     List<Reply> findList = replyRepository.findAllByComment_IdOrderByCreatedAtAsc(replyId);
@@ -98,8 +108,8 @@ public class ReviewServiceImpl implements ReviewService {
             responseDTO.setMyBoard(true);
         }
 
-        responseDTO.setCommentList(commentListDTO);
-        responseDTO.setCommentsCount(commentListDTO.size());
+        responseDTO.setCommentList(commentsForBoard);
+        responseDTO.setCommentsCount(commentsForBoard.size());
         responseDTO.setLiked(!liked.isEmpty());
         responseDTO.setLikeCount(findReview.getBoard().getLikeCount());
 
