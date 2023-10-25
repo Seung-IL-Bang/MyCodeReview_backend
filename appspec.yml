@@ -19,7 +19,3 @@ hooks:
     - location: deploy.sh
       timeout: 180
       runas: root
-  ValidateService:
-    - location: switch.sh
-      timeout: 180
-      runas: root
