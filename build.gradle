@@ -100,11 +100,11 @@ dependencies {
 	// Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.1.5'
 
-	// Jedis
-	implementation 'redis.clients:jedis:5.0.0'
-
 	// redis-reactive
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive:3.1.5'
+
+	// GenericObjectPoolConfig
+	implementation 'org.apache.commons:commons-pool2:2.12.0'
 
 
 }
