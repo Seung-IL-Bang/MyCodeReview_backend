@@ -238,17 +238,7 @@ public class BoardServiceImpl implements BoardService {
             }
 
             lock.lock(); // Caching Miss
-
             try {
-                boards = boardsCache.get(cacheKey, PageImplDeSerializeDTO.class);
-                if (boards != null) {
-                    return PageResponseDTO.<BoardListResponseDTO>builder()
-                            .pageRequestDTO(pageRequestDTO)
-                            .dtoList(boards.getList())
-                            .total(boards.getTotal()) // count(board_id)
-                            .build();
-                }
-
                 boards = boardRepository.searchPublicAll( // set cache
                         pageRequestDTO.getTypes(),
                         pageRequestDTO.getKeyword(),
