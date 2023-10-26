@@ -5,7 +5,6 @@ import com.querydsl.jpa.JPQLQuery;
 import com.web.app.domain.board.Board;
 import com.web.app.domain.board.QBoard;
 import com.web.app.dto.BoardListResponseDTO;
-import com.web.app.dto.BoardResponseDTO;
 import com.web.app.dto.PageImplDeSerializeDTO;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardSearch {
@@ -22,8 +20,6 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     public BoardSearchImpl() {
         super(Board.class);
     }
-
-    private final ReentrantLock lock = new ReentrantLock();
 
 
     @Override
