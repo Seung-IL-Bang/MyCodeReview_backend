@@ -2,6 +2,7 @@ package com.web.app.fixture;
 
 import com.web.app.domain.board.Board;
 import com.web.app.domain.member.Member;
+import com.web.app.dto.BoardListResponseDTO;
 import com.web.app.dto.BoardRequestDTO;
 import com.web.app.dto.BoardResponseDTO;
 import org.jeasy.random.EasyRandom;
@@ -48,6 +49,12 @@ public class BoardFixtureFactory {
         EasyRandomParameters param = new EasyRandomParameters().seed(seed);
         param.stringLengthRange(3, 10);
         return new EasyRandom(param).nextObject(BoardResponseDTO.class);
+    }
+
+    public static BoardListResponseDTO createListResponseDTO(Long seed) {
+        EasyRandomParameters param = new EasyRandomParameters().seed(seed);
+        param.stringLengthRange(3, 10);
+        return new EasyRandom(param).nextObject(BoardListResponseDTO.class);
     }
 
     public static Board createById(Long id) {

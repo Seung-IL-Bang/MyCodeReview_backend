@@ -1,8 +1,7 @@
 package com.web.app.controller;
 
 import com.web.app.domain.board.Board;
-import com.web.app.dto.BoardResponseDTO;
-import com.web.app.dto.PageImplDeSerializeDTO;
+import com.web.app.dto.BoardListResponseDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.service.ServiceForJMeter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +48,7 @@ public class ControllerForJMeter {
             pageRequestDTO = PageRequestDTO.builder().build();
         }
 
-        List<BoardResponseDTO> response = serviceForJMeter.searchPublicAll(pageRequestDTO);
+        List<BoardListResponseDTO> response = serviceForJMeter.searchPublicAll(pageRequestDTO);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

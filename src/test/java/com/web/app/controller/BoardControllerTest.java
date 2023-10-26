@@ -1,7 +1,7 @@
 package com.web.app.controller;
 
 import com.web.app.ControllerTestSupport;
-import com.web.app.domain.board.Board;
+import com.web.app.dto.BoardListResponseDTO;
 import com.web.app.dto.BoardResponseDTO;
 import com.web.app.dto.PageRequestDTO;
 import com.web.app.dto.PageResponseDTO;
@@ -9,9 +9,6 @@ import com.web.app.fixture.BoardFixtureFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -19,7 +16,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -80,14 +76,14 @@ class BoardControllerTest extends ControllerTestSupport {
     @WithMockUser // Why ??? /auth 가 없는데도 불구하고 테스트시 302 로그인 페이지로 리다이렉팅된다.
     void getPublicBoardList() throws Exception{
         //given
-        BoardResponseDTO boardResponseDTO1 = BoardFixtureFactory.createResponseDTO();
-        BoardResponseDTO boardResponseDTO2 = BoardFixtureFactory.createResponseDTO();
-        BoardResponseDTO boardResponseDTO3 = BoardFixtureFactory.createResponseDTO();
+        BoardListResponseDTO boardResponseDTO1 = BoardFixtureFactory.createListResponseDTO(1L);
+        BoardListResponseDTO boardResponseDTO2 = BoardFixtureFactory.createListResponseDTO(2L);
+        BoardListResponseDTO boardResponseDTO3 = BoardFixtureFactory.createListResponseDTO(3L);
 
 
-        List<BoardResponseDTO> dtoList = List.of(boardResponseDTO1, boardResponseDTO2, boardResponseDTO3);
+        List<BoardListResponseDTO> dtoList = List.of(boardResponseDTO1, boardResponseDTO2, boardResponseDTO3);
 
-        PageResponseDTO<BoardResponseDTO> result = PageResponseDTO.<BoardResponseDTO>builder()
+        PageResponseDTO<BoardListResponseDTO> result = PageResponseDTO.<BoardListResponseDTO>builder()
                 .pageRequestDTO(new PageRequestDTO())
                 .dtoList(dtoList)
                 .total(dtoList.size())
