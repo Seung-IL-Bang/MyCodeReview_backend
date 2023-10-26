@@ -10,12 +10,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +32,9 @@ public class BoardServiceImpl implements BoardService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
+
+    private final CacheManager cacheManager;
+    private final ReentrantLock lock = new ReentrantLock();
 
 
     @Override
@@ -213,22 +219,65 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public PageResponseDTO<BoardResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<BoardListResponseDTO> readPublicAllWithPagingAndSearch(PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable("createdAt");
+        PageImplDeSerializeDTO<BoardListResponseDTO> boards = null;
 
-        PageImplDeSerializeDTO<BoardResponseDTO> boards = boardRepository.searchPublicAll(
-                pageRequestDTO.getTypes(),
-                pageRequestDTO.getKeyword(),
-                pageRequestDTO.getDifficulties(),
-                pageRequestDTO.getTag(),
-                pageable);
+        if (pageRequestDTO.getTypes() == null) {
+            Cache boardsCache = cacheManager.getCache("boards");
+            String cacheKey = String.valueOf(pageable.getPageNumber());
+            boards = boardsCache.get(cacheKey, PageImplDeSerializeDTO.class);
 
-        return PageResponseDTO.<BoardResponseDTO>builder()
-                .pageRequestDTO(pageRequestDTO)
-                .dtoList(boards.getList())
-                .total(boards.getTotal()) // count(board_id)
-                .build();
+            if (boards != null) { // Caching Hit
+                return PageResponseDTO.<BoardListResponseDTO>builder()
+                        .pageRequestDTO(pageRequestDTO)
+                        .dtoList(boards.getList())
+                        .total(boards.getTotal()) // count(board_id)
+                        .build();
+            }
+
+            lock.lock(); // Caching Miss
+
+            try {
+                boards = boardsCache.get(cacheKey, PageImplDeSerializeDTO.class);
+                if (boards != null) {
+                    return PageResponseDTO.<BoardListResponseDTO>builder()
+                            .pageRequestDTO(pageRequestDTO)
+                            .dtoList(boards.getList())
+                            .total(boards.getTotal()) // count(board_id)
+                            .build();
+                }
+
+                boards = boardRepository.searchPublicAll( // set cache
+                        pageRequestDTO.getTypes(),
+                        pageRequestDTO.getKeyword(),
+                        pageRequestDTO.getDifficulties(),
+                        pageRequestDTO.getTag(),
+                        pageable);
+                return PageResponseDTO.<BoardListResponseDTO>builder()
+                        .pageRequestDTO(pageRequestDTO)
+                        .dtoList(boards.getList())
+                        .total(boards.getTotal()) // count(board_id)
+                        .build();
+            } finally {
+                lock.unlock();
+            }
+        } else { // types != null 인 경우 캐싱 없이 DB에서 조회
+            boards = boardRepository.searchPublicAll(
+                    pageRequestDTO.getTypes(),
+                    pageRequestDTO.getKeyword(),
+                    pageRequestDTO.getDifficulties(),
+                    pageRequestDTO.getTag(),
+                    pageable);
+
+            return PageResponseDTO.<BoardListResponseDTO>builder()
+                    .pageRequestDTO(pageRequestDTO)
+                    .dtoList(boards.getList())
+                    .total(boards.getTotal()) // count(board_id)
+                    .build();
+        }
+
     }
 
     @Override
