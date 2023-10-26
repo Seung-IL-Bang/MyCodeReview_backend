@@ -100,6 +100,13 @@ dependencies {
 	// Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.1.5'
 
+	// redis-reactive
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive:3.1.5'
+
+	// GenericObjectPoolConfig
+	implementation 'org.apache.commons:commons-pool2:2.12.0'
+
+
 }
 
 tasks.named('test') {

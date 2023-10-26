@@ -53,6 +53,7 @@ nohup java \
 -Dcom.sun.management.jmxremote.authenticate=true \
 -Dcom.sun.management.jmxremote.access.file=/home/ubuntu/app/config/jmxremote.access \
 -Dcom.sun.management.jmxremote.password.file=/home/ubuntu/app/config/jmxremote.password \
+-Dcom.sun.management.jmxremote.ssl=false \
 -Djava.rmi.server.hostname=43.202.39.58 \
 -jar "$APPLICATION_PATH" \
 > /dev/null \
