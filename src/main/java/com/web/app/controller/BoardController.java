@@ -40,7 +40,7 @@ public class BoardController {
             pageRequestDTO = PageRequestDTO.builder().build();
         }
 
-        PageResponseDTO<BoardResponseDTO> response = boardService.readPublicAllWithPagingAndSearch(pageRequestDTO);
+        PageResponseDTO<BoardListResponseDTO> response = boardService.readPublicAllWithPagingAndSearch(pageRequestDTO);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

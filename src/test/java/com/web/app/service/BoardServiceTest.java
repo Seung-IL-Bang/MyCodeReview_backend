@@ -7,10 +7,7 @@ import com.web.app.domain.likes.Likes;
 import com.web.app.domain.member.Member;
 import com.web.app.domain.reply.Reply;
 import com.web.app.domain.review.Review;
-import com.web.app.dto.BoardRequestDTO;
-import com.web.app.dto.BoardResponseDTO;
-import com.web.app.dto.PageRequestDTO;
-import com.web.app.dto.PageResponseDTO;
+import com.web.app.dto.*;
 import com.web.app.fixture.*;
 import com.web.app.repository.*;
 import com.web.app.util.JWTUtil;
@@ -19,9 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Map;
@@ -196,24 +191,24 @@ public class BoardServiceTest extends IntegrationTestSupport {
     @Test
     void readPublicAllWithPagingAnd() {
         //given
-        Board board1 = BoardFixtureFactory.create();
-        Board board2 = BoardFixtureFactory.create();
-        Board board3 = BoardFixtureFactory.create();
+        Board board1 = BoardFixtureFactory.create(1L);
+        Board board2 = BoardFixtureFactory.create(2L);
+        Board board3 = BoardFixtureFactory.create(3L);
 
         List<Board> boards = boardRepository.saveAll(List.of(board1, board2, board3));
 
         PageRequestDTO pageRequestDTO = new PageRequestDTO();
 
         // when
-        PageResponseDTO<BoardResponseDTO> responseDTO = boardService.readPublicAllWithPagingAndSearch(pageRequestDTO);
+        PageResponseDTO<BoardListResponseDTO> responseDTO = boardService.readPublicAllWithPagingAndSearch(pageRequestDTO);
 
         // then
         assertThat(responseDTO.getDtoList()).hasSize(3)
-                .extracting("id", "title", "content")
+                .extracting("id", "title")
                 .containsExactlyInAnyOrder(
-                        tuple(boards.get(0).getId(), board1.getTitle(), board1.getContent()),
-                        tuple(boards.get(1).getId(), board2.getTitle(), board2.getContent()),
-                        tuple(boards.get(2).getId(), board3.getTitle(), board3.getContent())
+                        tuple(boards.get(0).getId(), boards.get(0).getTitle()),
+                        tuple(boards.get(1).getId(), boards.get(1).getTitle()),
+                        tuple(boards.get(2).getId(), boards.get(2).getTitle())
                 );
         assertThat(responseDTO.getPage()).isEqualTo(1);
         assertThat(responseDTO.getSize()).isEqualTo(8);
