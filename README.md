@@ -25,7 +25,14 @@
 <details>
   <summary>📂 Version History</summary>
 
-  ### [Version-1.1.2 [23.10.16] [latest]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/37)
+  ### [Version-1.1.3 [23.10.26] [latest]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/39)
+  - 좋아요 기능의 동시성 유발 테스트 환경 개선
+  - 자동 배포 시 Health Check 로직: 기존 port 넘버 체크 -> Actuator로 수정
+  - buildspec.yml, appspec.yml 수정
+  - 직렬화 & 역직렬화 테스트 케이스 추가
+  - cache stampede 방지를 위한 캐싱 로직에 Lock 메커니즘 추가.
+
+  ### [Version-1.1.2 [23.10.16]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/37)
   - Dummy Data 추가 기능
   - Review 작성 및 수정 시 엔티티 검증 추가
   - Board 단일 조회시 작성자 식별 불가능 오류 수정
@@ -53,6 +60,7 @@
 🔎 목차
   - [성능 테스트를 위한 Dummy Data 벌크 인서트](#성능-테스트를-위한-dummy-data-벌크-인서트)
   - [인덱스를 통한 쿼리 성능 개선하기](#인덱스를-통한-쿼리-성능-개선하기)
+  - [DB 부하를 줄이기 위한 캐싱](#db-부하를-줄이기-위한-캐싱)
   - [단위 테스트 작성 & 테스트 환경 최적화](#단위-테스트-작성--테스트-환경-최적화)
   - [AWS Pipeline & Nginx를 활용한 무중단 배포](#aws-pipeline--nginx를-활용한-무중단-배포)
   - [OAuth2 & JWT 기반 로그인 기능](#oauth2--jwt-기반-로그인-기능)
@@ -105,8 +113,16 @@
 
 <img width="2030" alt="index" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/e879d160-214c-41e8-ab5f-0ba886e2acfd">
 
+<br/>
 
-
+## DB 부하를 줄이기 위한 캐싱
+- 게시글 목록 조회는 많은 사용자들이 사용할 API로 예상되어 DB의 많은 부하가 발생할 것으로 예상하여, DB 부하를 줄이고자 캐시 저장소를 도입하기로 결정했습니다.
+- 캐시 저장소로 Memcached와 Redis 둘 중에 어떤 것을 사용해야 할지 장단점을 비교하여 결정했습니다.
+- Memcached는 안정적이고 빠른 응답 속도를 가진다는 장점이 있지만, 데이터 복구 미지원 및 다양한 캐싱 요구 사항에 대응하기에는 부족한 측면이 있습니다.
+- 반면에 Redis는 다양한 데이터 구조를 지원하여 다양한 캐싱 요구 사항에 대응할 수 있으며, RDB, AOF 등을 통해 시스템 장애나 재시작시에 데이터를 보존할 수 있습니다.
+- Spring에서도 공식적으로 Redis를 지원하고 있기도 하고 활발한 커뮤니티가 존재하기 때문에 참고할 자료가 풍부했습니다.
+- 결과적으로 Spring Boot 환경에서 Redis는 다양한 캐싱 요구 사항과 확장성, 지속성 등의 면에서 Memcached보다 더 나은 선택이 될 것 같아 Redis를 사용하기로 결정했습니다.
+- 스케일 아웃 방식의 분산 환경으로 확장하는 것을 고려했을 때 글로벌 캐싱 전략으로 Redis를 사용하기로 결정했습니다.
 
 
 <br/>
