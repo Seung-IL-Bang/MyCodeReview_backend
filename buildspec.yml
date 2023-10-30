@@ -7,6 +7,8 @@ phases:
     commands:
       - apt update
       - apt install -y net-tools
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
       - aws ecr-public get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
   build:
     commands:
