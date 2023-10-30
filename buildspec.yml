@@ -7,8 +7,6 @@ phases:
     commands:
       - apt update
       - apt install -y net-tools
-      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
-      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done" # Docker 데몬이 정상적으로 실행되었는지 15초 동안 확인
       - aws ecr-public get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
   build:
     commands:
@@ -16,27 +14,11 @@ phases:
       - gradle wrapper
       - chmod +x ./gradlew
       - ./gradlew build
-  post_build:
-    commands:
-      - echo Post_build Start
-      - echo 'FROM openjdk:17' > Dockerfile
-      - echo 'WORKDIR /app' >> Dockerfile
-      - echo 'COPY ./build/libs/*-SNAPSHOT.jar app.jar' >> Dockerfile
-      - echo 'ENV IDLE_PORT=8080' >> Dockerfile
-      - echo 'ENV JAVA_RMI_SERVER_HOSTNAME=localhost' >>Dockerfile
-      - echo 'CMD java \\' >> Dockerfile
-      - echo '-Dserver.port=$IDLE_PORT \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.port=1099 \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.rmi.port=1099 \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.authenticate=true \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.access.file=/app/config/jmxremote.access \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.password.file=/app/config/jmxremote.password \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.ssl=false \\' >> Dockerfile
-      - echo '-Djava.rmi.server.hostname=$JAVA_RMI_SERVER_HOSTNAME \\' >> Dockerfile
-      - echo '-jar app.jar' >> Dockerfile
       - docker build -t $MY_ECR_REPOSITORY_NAME:latest .
       - docker tag $MY_ECR_REPOSITORY_NAME:latest $MY_ECR_URI:latest
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
       - docker push $MY_ECR_URI:latest
 
 artifacts:
