@@ -2,7 +2,7 @@
 
 echo "==========================START DEPLOY=========================="
 
-DOCKER_COMPOSE_FILE=/home/ubuntu/build/docker-compose.yml # 인스턴스 초기화시 docker-compose.yml 다운
+DOCKER_COMPOSE_FILE=/home/ubuntu/docker-compose.yml # 인스턴스 초기화시 docker-compose.yml 다운
 
 echo "==========================PULL IMAGE=========================="
 docker pull "${ECR_IMAGE}" # 인스턴스 초기화시 docker 설치  # 인스턴스 초기화시 ~/.bashrc 변수 입력 필요

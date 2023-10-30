@@ -1,1 +1,1 @@
-chmod +x /home/ubuntu/build/**
+#chmod +x /home/ubuntu/build/**
