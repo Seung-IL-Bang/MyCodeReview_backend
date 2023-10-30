@@ -44,6 +44,7 @@ phases:
 
 artifacts:
   files:
-    - scripts/**
+    - scripts/deploy.sh
     - appspec.yml
+    - docker-compose.yml
   discard-paths: yes

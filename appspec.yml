@@ -3,18 +3,18 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ubuntu/build
+    destination: /home/ubuntu/
 
 
 hooks:
-  BeforeInstall:
-    - location: backup.sh
-      timeout: 60
-      runas: root
-  AfterInstall:
-    - location: chmod.sh
-      timeout: 60
-      runas: root
+#  BeforeInstall:
+#    - location: backup.sh
+#      timeout: 60
+#      runas: root
+#  AfterInstall:
+#    - location: chmod.sh
+#      timeout: 60
+#      runas: root
   ApplicationStart:
     - location: deploy.sh
       timeout: 180
