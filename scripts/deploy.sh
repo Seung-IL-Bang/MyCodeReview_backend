@@ -1,12 +1,11 @@
 #!/bin/bash
 
 echo "==========================START DEPLOY=========================="
-BASE_PATH=/home/ubuntu/build
-BUILD_PATH=$(ls $BASE_PATH/*.jar)
-JAR_FILE=$(basename "$BUILD_PATH")
 
-echo ">>> BUILD_PATH:" "$BUILD_PATH"
-echo ">>> JAR_FILE: $JAR_FILE"
+DOCKER_COMPOSE_FILE=/home/ubuntu/docker-compose.yml # 인스턴스 초기화시 docker-compose.yml 다운
+
+echo "==========================PULL IMAGE=========================="
+docker pull "${ECR_IMAGE}" # 인스턴스 초기화시 docker 설치  # 인스턴스 초기화시 ~/.bashrc 변수 입력 필요
 
 echo "==========================현재 구동중인 Port 확인=========================="
 CURRENT_PORT=$(curl -s http://localhost/port)
@@ -15,55 +14,36 @@ echo ">>> CURRENT_PORT:" "$CURRENT_PORT"
 if [ "$CURRENT_PORT" == 8081 ]
 then
   IDLE_PORT=8082
+  IDLE_SERVICE=app2
+  NO_COMPOSE=0
 elif [ "$CURRENT_PORT" == 8082 ]
 then
   IDLE_PORT=8081
+  IDLE_SERVICE=app1
+  NO_COMPOSE=0
 else
   echo ">>> 일치하는 Port 가 없습니다."
-  echo ">>> 8081 Port 를 할당합니다."
+  echo ">>> 기본 docker-compose.yml 구성대로 시작합니다."
+  NO_COMPOSE=1
   IDLE_PORT=8081
+  IDLE_SERVICE=app1
 fi
 
-echo ">>> IDLE_PORT: " $IDLE_PORT
-
-echo ">>> $IDLE_PORT 로 실행중인 애플리케이션 PID 확인"
-IDLE_PID=$(sudo lsof -t -i:$IDLE_PORT)
-echo ">>> IDLE_PID: $IDLE_PID"
-
-echo "==========================IDLE_APPLICATION 종료 프로세스 시작=========================="
-if [ -z "$IDLE_PID" ]
+if [ "$NO_COMPOSE" == 1 ]
 then
-  echo ">>> 현재 PID:$IDLE_PID 로 구동중인 애플리케이션이 없으므로 종료하지 않습니다."
+  cd /home/ubuntu/build
+  docker-compose up -d # 인스턴스 초기화 시 docker-compose 설치
 else
-  echo ">>> kill -15 $IDLE_PID"
-  kill -15 "$IDLE_PID"
-  echo "==========================Success kill IDLE_APPLICATION=========================="
-  echo ">>> sleep 5"
-  sleep 5
+  NEW_IMAGE=$ECR_IMAGE
+  CURRENT_IMAGE=$(awk "/$IDLE_SERVICE:/,/image:/" $DOCKER_COMPOSE_FILE | grep "image:" | awk '{print $2}')
+  sed -i "/$IDLE_SERVIE:/,/image:/s/image: $CURRENT_IMAGE/image: $NEW_IMAGE/" $DOCKER_COMPOSE_FILE # IDLE_SERVICE 컨테이너에 새로운 이미지 작성
+  docker-compose up -d $IDLE_SERVICE # 새로운 이미지를 적용한 IDLE_SERVICE 컨테이너만 재시작
 fi
 
-echo "==========================New Revision Application START in PORT:$IDLE_PORT=========================="
-APPLICATION_PATH=$BASE_PATH/$JAR_FILE
-echo ">>> APPLICATION_PATH: " "$APPLICATION_PATH"
-nohup java \
--Dserver.port=$IDLE_PORT \
--Dcom.sun.management.jmxremote \
--Dcom.sun.management.jmxremote.port=1099 \
--Dcom.sun.management.jmxremote.rmi.port=1099 \
--Dcom.sun.management.jmxremote.authenticate=true \
--Dcom.sun.management.jmxremote.access.file=/home/ubuntu/app/config/jmxremote.access \
--Dcom.sun.management.jmxremote.password.file=/home/ubuntu/app/config/jmxremote.password \
--Dcom.sun.management.jmxremote.ssl=false \
--Djava.rmi.server.hostname=43.202.39.58 \
--jar "$APPLICATION_PATH" \
-> /dev/null \
-2> /dev/null \
-< /dev/null &
+
 
 echo "==========================IDLE Port:$IDLE_PORT Application 10초 후 Health Check 시작=========================="
 sleep 10
-
-
 echo "==========================Start Health Check=========================="
 echo ">>> curl -s http://localhost:$IDLE_PORT/actuator/health"
 for retry_count in {1..10}
@@ -91,12 +71,12 @@ do
 done
 
 echo "==========================Application Switch Process=========================="
-echo "set \$service_url http://127.0.0.1:${IDLE_PORT};" |sudo tee /etc/nginx/conf.d/service-url.inc
+echo "set \$service_url http://${IDLE_SERVICE}:${IDLE_PORT};" | sudo tee /home/ubuntu/app/nginx/service-url.inc
 
 echo ">>> Nginx Current Proxy Port:" "$CURRENT_PORT"
 
 echo "==========================Nginx Reload=========================="
-sudo service nginx reload
+docker exec ubuntu-nginx-1 nginx -s reload # 인스턴스 초기화 시 docker 설치 필요
 
 sleep 3
 NEW_PROXY_PORT=$(curl -s http://localhost/port)

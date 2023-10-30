@@ -1,0 +1,31 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - type: bind
+        source: /home/ubuntu/app/nginx/default
+        target: /etc/nginx/conf.d/default.conf
+      - type: bind
+        source: /home/ubuntu/app/nginx/service-url.inc
+        target: /etc/nginx/service-url.inc
+  app1:
+    image: ${ECR_IMAGE}
+    ports:
+      - ${PORT1}:${PORT1}
+    environment:
+      - IDLE_PORT=${PORT1}
+      - JAVA_RMI_SERVER_HOSTNAME=${HOST_IP}
+    volumes:
+      - /home/ubuntu/app/config:/home/ubuntu/app/config
+  app2:
+    image: ${ECR_IMAGE}
+    ports:
+      - ${PORT2}:${PORT2}
+    environment:
+      - IDLE_PORT=${PORT2}
+      - JAVA_RMI_SERVER_HOSTNAME=${HOST_IP}
+    volumes:
+      - /home/ubuntu/app/config:/home/ubuntu/app/config
