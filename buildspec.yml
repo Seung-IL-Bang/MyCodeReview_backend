@@ -7,7 +7,7 @@ phases:
     commands:
       - apt update
       - apt install -y net-tools
-      - aws ecr get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
+      - aws ecr-public get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
   build:
     commands:
       - echo Phase/build Start
