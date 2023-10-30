@@ -32,7 +32,7 @@ phases:
       - echo '-Dcom.sun.management.jmxremote.password.file=/app/config/jmxremote.password \\' >> Dockerfile
       - echo '-Dcom.sun.management.jmxremote.ssl=false \\' >> Dockerfile
       - echo '-Djava.rmi.server.hostname=$JAVA_RMI_SERVER_HOSTNAME \\' >> Dockerfile
-      - echo '-jar /app/app.jar' >> Dockerfile
+      - echo '-jar app.jar' >> Dockerfile
       - docker build -t $MY_ECR_REPOSITORY_NAME:latest .
       - docker tag $MY_ECR_REPOSITORY_NAME:latest $MY_ECR_URI:latest
       - docker push $MY_ECR_URI:latest
