@@ -31,7 +31,7 @@ fi
 
 if [ "$NO_COMPOSE" == 1 ]
 then
-  cd /home/ubuntu/build
+  cd /home/ubuntu/
   docker-compose up -d # 인스턴스 초기화 시 docker-compose 설치
 else
   NEW_IMAGE=$ECR_IMAGE
