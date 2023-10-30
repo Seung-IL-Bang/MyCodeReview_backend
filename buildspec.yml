@@ -7,9 +7,6 @@ phases:
     commands:
       - apt update
       - apt install -y net-tools
-      - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      - unzip awscliv2.zip
-      - sudo ./aws/install
       - yum install -y docker
       - service docker start
       - aws ecr get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
@@ -21,7 +18,7 @@ phases:
       - ./gradlew build
   post_build:
     commands:
-      - echo Post_build Startc
+      - echo Post_build Start
       - echo 'FROM openjdk:17' > Dockerfile
       - echo 'WORKDIR /app' >> Dockerfile
       - echo 'COPY ./build/libs/*-SNAPSHOT.jar app.jar' >> Dockerfile
