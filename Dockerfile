@@ -10,8 +10,8 @@ ENV JAVA_RMI_SERVER_HOSTNAME=localhost
 CMD java \
 -Dserver.port=$IDLE_PORT \
 -Dcom.sun.management.jmxremote \
--Dcom.sun.management.jmxremote.port=1099 \
--Dcom.sun.management.jmxremote.rmi.port=1099 \
+-Dcom.sun.management.jmxremote.port=$IDLE_PORT \
+-Dcom.sun.management.jmxremote.rmi.port=$IDLE_PORT \
 -Dcom.sun.management.jmxremote.authenticate=true \
 -Dcom.sun.management.jmxremote.access.file=/app/config/jmxremote.access \
 -Dcom.sun.management.jmxremote.password.file=/app/config/jmxremote.password \
