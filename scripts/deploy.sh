@@ -39,14 +39,11 @@ then
   cd /home/ubuntu/
   docker-compose up -d # 인스턴스 초기화 시 docker-compose 설치
 else
-  NEW_IMAGE=${ECR_IMAGE}
-  CURRENT_IMAGE=$(awk "/$IDLE_SERVICE:/,/image:/" $DOCKER_COMPOSE_FILE | grep "image:" | awk '{print $2}')
-  sed -i "/$IDLE_SERVICE:/,/image:/s#image: $CURRENT_IMAGE#image: $NEW_IMAGE#" $DOCKER_COMPOSE_FILE # IDLE_SERVICE 컨테이너에 새로운 이미지 작성
   docker-compose up -d $IDLE_SERVICE # 새로운 이미지를 적용한 IDLE_SERVICE 컨테이너만 재시작
 fi
 
 
-echo "==========================<IDLE_SERVICE, IDLE_PORT>:<$IDLE_IDLE_SERVICE, $IDLE_PORT> Container 10초 후 Health Check 시작=========================="
+echo "==========================<IDLE_SERVICE, IDLE_PORT>:<$IDLE_SERVICE, $IDLE_PORT> Container 10초 후 Health Check 시작=========================="
 sleep 10
 echo "==========================START HEALTH CHECK=========================="
 echo ">>> curl -s http://localhost:$IDLE_PORT/actuator/health"
