@@ -8,6 +8,7 @@ phases:
       - apt update
       - apt install -y net-tools
       - aws ecr-public get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
+      - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin docker.io
   build:
     commands:
       - echo Phase/build Start
