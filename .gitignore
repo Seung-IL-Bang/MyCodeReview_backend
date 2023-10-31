@@ -13,6 +13,8 @@ application-prodoauth.yml
 application-prod.yml
 src/main/generated
 jmxremote.*
+.env
+userdata.sh
 
 ### STS ###
 .apt_generated
