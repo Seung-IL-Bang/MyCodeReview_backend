@@ -41,7 +41,7 @@ then
 else
   NEW_IMAGE=${ECR_IMAGE}
   CURRENT_IMAGE=$(awk "/$IDLE_SERVICE:/,/image:/" $DOCKER_COMPOSE_FILE | grep "image:" | awk '{print $2}')
-  sed -i "/$IDLE_SERVICE:/,/image:/s/image: $CURRENT_IMAGE/image: $NEW_IMAGE/" $DOCKER_COMPOSE_FILE # IDLE_SERVICE 컨테이너에 새로운 이미지 작성
+  sed -i "/$IDLE_SERVICE:/,/image:/s#image: $CURRENT_IMAGE#image: $NEW_IMAGE#" $DOCKER_COMPOSE_FILE # IDLE_SERVICE 컨테이너에 새로운 이미지 작성
   docker-compose up -d $IDLE_SERVICE # 새로운 이미지를 적용한 IDLE_SERVICE 컨테이너만 재시작
 fi
 
