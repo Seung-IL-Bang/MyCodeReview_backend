@@ -15,17 +15,21 @@ services:
     image: ${ECR_IMAGE}
     ports:
       - ${PORT1}:${PORT1}
+      - ${JMX_PORT1}:${JMX_PORT1}
     environment:
       - IDLE_PORT=${PORT1}
       - JAVA_RMI_SERVER_HOSTNAME=${HOST_IP}
+      - JMX_PORT=${JMX_PORT1}
     volumes:
       - /home/ubuntu/app/config:/home/ubuntu/app/config
   app2:
     image: ${ECR_IMAGE}
     ports:
       - ${PORT2}:${PORT2}
+      - ${JMX_PORT2}:${JMX_PORT2}
     environment:
       - IDLE_PORT=${PORT2}
       - JAVA_RMI_SERVER_HOSTNAME=${HOST_IP}
+      - JMX_PORT=${JMX_PORT2}
     volumes:
       - /home/ubuntu/app/config:/home/ubuntu/app/config
