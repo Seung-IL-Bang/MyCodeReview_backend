@@ -8,6 +8,7 @@ ENV IDLE_PORT=8080
 ENV JMX_PORT=9010
 ENV JAVA_RMI_SERVER_HOSTNAME=127.0.0.1
 
+
 CMD java \
 -Dserver.port=$IDLE_PORT \
 -Dcom.sun.management.jmxremote=true \
