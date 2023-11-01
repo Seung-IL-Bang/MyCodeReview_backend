@@ -4,10 +4,12 @@ echo "==========================START DEPLOY=========================="
 DOCKER_COMPOSE_FILE=/home/ubuntu/docker-compose.yml # 인스턴스 초기화시 docker-compose.yml 다운
 
 echo "==========================DOCKER CLIENT LOGIN=========================="
-aws ecr-public get-login-password --region "${MY_REGION}" | docker login --username AWS --password-stdin "${ECR_URL}"
+aws ecr-public get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_URL}"
 
 echo "==========================DOCKER PULL IMAGE=========================="
-docker pull "${ECR_IMAGE}" # 인스턴스 초기화시 docker 설치  # 인스턴스 초기화시 ~/.bashrc 변수 입력 필요
+LATEST_IMAGE_DIGEST=$(aws ecr describe-images --repository-name "${ECR_REPOSITORY}" --region "${ECR_REGION}" --output json --query 'sort_by(imageDetails,& imagePushedAt) | [-1].imageDigest' --max-items 1 | tr -d '"')
+docker pull "${ECR_URI}"@"$LATEST_IMAGE_DIGEST"
+docker tag  "${ECR_URI}"@"$LATEST_IMAGE_DIGEST" "${ECR_IMAGE}"
 
 
 CURRENT_PORT=$(curl -s http://localhost/port)
