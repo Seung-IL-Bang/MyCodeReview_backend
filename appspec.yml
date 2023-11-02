@@ -7,10 +7,10 @@ files:
 
 
 hooks:
-#  BeforeInstall:
-#    - location: backup.sh
-#      timeout: 60
-#      runas: root
+  BeforeInstall:
+    - location: clean.sh
+      timeout: 60
+      runas: root
 #  AfterInstall:
 #    - location: chmod.sh
 #      timeout: 60
