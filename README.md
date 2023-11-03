@@ -11,7 +11,7 @@
     
 
 ## Architecture
-![My Review](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/571540ca-b92c-475c-972b-9933b1d989ce)
+![v2 0 0](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/512f40fb-1fe9-4d55-8704-0c7f2ed4e637)
 
 
 
