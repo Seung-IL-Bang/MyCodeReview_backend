@@ -2,7 +2,7 @@
 
 echo "==========================START DEPLOY=========================="
 echo "==========================CALL env_var.sh=========================="
-source /home/app/config/env_var.sh
+source /home/ubuntu/app/config/env_var.sh
 
 DOCKER_COMPOSE_FILE=/home/ubuntu/docker-compose.yml # 인스턴스 초기화시 docker-compose.yml 다운
 sudo usermod -aG docker ubuntu # docker group 에 사용자를 추가하여 sudo 없이 명령어 실행
