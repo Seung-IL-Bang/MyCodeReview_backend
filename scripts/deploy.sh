@@ -42,10 +42,9 @@ fi
 if [ "$NO_COMPOSE" == 1 ]
 then
   echo "==========================기본 docker-compose.yml 구성으로 시작합니다.=========================="
-  cd /home/ubuntu/
-  docker-compose up -d # 인스턴스 초기화 시 docker-compose 설치
+  docker-compose -f $DOCKER_COMPOSE_FILE up -d # 인스턴스 초기화 시 docker-compose 설치
 else
-  docker-compose up -d $IDLE_SERVICE # 새로운 이미지를 적용한 IDLE_SERVICE 컨테이너만 재시작
+  docker-compose -f $DOCKER_COMPOSE_FILE up -d $IDLE_SERVICE # 새로운 이미지를 적용한 IDLE_SERVICE 컨테이너만 재시작
 fi
 
 
