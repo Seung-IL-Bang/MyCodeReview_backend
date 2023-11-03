@@ -7,7 +7,7 @@ echo "==========================DOCKER CLIENT LOGIN=========================="
 aws ecr-public get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_URL}"
 
 echo "==========================DOCKER PULL IMAGE=========================="
-LATEST_IMAGE_DIGEST=$(aws ecr describe-images --repository-name "${ECR_REPOSITORY}" --region "${ECR_REGION}" --output json --query 'sort_by(imageDetails,& imagePushedAt) | [-1].imageDigest' --max-items 1 | tr -d '"')
+LATEST_IMAGE_DIGEST=$(aws ecr-public describe-images --repository-name "${ECR_REPOSITORY}" --region "${ECR_REGION}" --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageDigest' | tr -d '"')
 docker pull "${ECR_URI}"@"$LATEST_IMAGE_DIGEST"
 docker tag  "${ECR_URI}"@"$LATEST_IMAGE_DIGEST" "${ECR_IMAGE}"
 
