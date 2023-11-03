@@ -3,7 +3,11 @@
 echo "==========================START DEPLOY=========================="
 DOCKER_COMPOSE_FILE=/home/ubuntu/docker-compose.yml # 인스턴스 초기화시 docker-compose.yml 다운
 
+sudo usermod -aG docker ubuntu
+
 echo "==========================DOCKER CLIENT LOGIN=========================="
+echo "ECR_REGION: " "${ECR_REGION}"
+echo "ECR_URL: " "${ECR_URL}"
 aws ecr-public get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_URL}"
 
 echo "==========================DOCKER PULL IMAGE=========================="
