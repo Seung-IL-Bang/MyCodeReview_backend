@@ -15,6 +15,7 @@ src/main/generated
 jmxremote.*
 .env
 userdata.sh
+scripts/env_var.sh
 
 ### STS ###
 .apt_generated
