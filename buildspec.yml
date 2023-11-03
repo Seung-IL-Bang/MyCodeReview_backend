@@ -26,6 +26,7 @@ artifacts:
   files:
     - scripts/deploy.sh
     - scripts/clean.sh
+    - scripts/chmod.sh
     - appspec.yml
     - docker-compose.yml
   discard-paths: yes

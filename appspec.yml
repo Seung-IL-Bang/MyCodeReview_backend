@@ -11,10 +11,10 @@ hooks:
     - location: clean.sh
       timeout: 60
       runas: root
-#  AfterInstall:
-#    - location: chmod.sh
-#      timeout: 60
-#      runas: root
+  AfterInstall:
+    - location: chmod.sh
+      timeout: 60
+      runas: root
   ApplicationStart:
     - location: deploy.sh
       timeout: 180
