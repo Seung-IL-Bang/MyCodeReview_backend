@@ -16,6 +16,7 @@ jmxremote.*
 .env
 userdata.sh
 scripts/env_var.sh
+proxysql.cnf
 
 ### STS ###
 .apt_generated
