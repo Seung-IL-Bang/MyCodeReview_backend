@@ -7,44 +7,26 @@ phases:
     commands:
       - apt update
       - apt install -y net-tools
-      - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      - unzip awscliv2.zip
-      - sudo ./aws/install
-      - yum install -y docker
-      - service docker start
-      - aws ecr get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
+      - aws ecr-public get-login-password --region $MY_REGION | docker login --username AWS --password-stdin $MY_ECR_URL
+      - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin docker.io
   build:
     commands:
       - echo Phase/build Start
       - gradle wrapper
       - chmod +x ./gradlew
       - ./gradlew build
-  post_build:
-    commands:
-      - echo Post_build Startc
-      - echo 'FROM openjdk:17' > Dockerfile
-      - echo 'WORKDIR /app' >> Dockerfile
-      - echo 'COPY ./build/libs/*-SNAPSHOT.jar app.jar' >> Dockerfile
-      - echo 'ENV IDLE_PORT=8080' >> Dockerfile
-      - echo 'ENV JAVA_RMI_SERVER_HOSTNAME=localhost' >>Dockerfile
-      - echo 'CMD java \\' >> Dockerfile
-      - echo '-Dserver.port=$IDLE_PORT \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.port=1099 \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.rmi.port=1099 \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.authenticate=true \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.access.file=/app/config/jmxremote.access \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.password.file=/app/config/jmxremote.password \\' >> Dockerfile
-      - echo '-Dcom.sun.management.jmxremote.ssl=false \\' >> Dockerfile
-      - echo '-Djava.rmi.server.hostname=$JAVA_RMI_SERVER_HOSTNAME \\' >> Dockerfile
-      - echo '-jar /app/app.jar' >> Dockerfile
       - docker build -t $MY_ECR_REPOSITORY_NAME:latest .
       - docker tag $MY_ECR_REPOSITORY_NAME:latest $MY_ECR_URI:latest
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
       - docker push $MY_ECR_URI:latest
 
 artifacts:
   files:
     - scripts/deploy.sh
+    - scripts/clean.sh
+    - scripts/chmod.sh
     - appspec.yml
     - docker-compose.yml
   discard-paths: yes
