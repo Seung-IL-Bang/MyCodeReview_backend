@@ -35,5 +35,17 @@ services:
       - /home/ubuntu/app/config:/home/ubuntu/app/config
     networks:
       - backend
+  proxysql:
+    image: proxysql/proxysql:2.1.0
+    container_name: proxysql
+    hostname: proxysql
+    ports:
+      - "6032:6032"
+      - "6033:6033"
+    volumes:
+      - "/home/ubuntu/app/proxysql/data:/var/lib/proxysql"
+      - "/home/ubuntu/app/proxysql/conf/proxysql.cnf:/etc/proxysql.cnf"
+    networks:
+      - backend
 networks:
   backend:
