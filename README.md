@@ -6,12 +6,13 @@
 ⏳ 개발 기간: 2023.04 ~ 진행 중
 
 👨🏻‍💻 프로젝트 소개
-  - 개인 프로젝트로 프론트부터 백엔드 및 무중단 배포까지 모두 구현한 프로젝트입니다.
+  - 개인 프로젝트로 프론트부터 백엔드 및 CI/CD까지 모두 구현한 프로젝트입니다.
   - 코딩 테스트 문제 풀이를 정리하고 복습하고 공유할 수 있는 웹 사이트입니다.
     
 
 ## Architecture
-![v2 0 0](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/512f40fb-1fe9-4d55-8704-0c7f2ed4e637)
+![v3 0 0](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/c71d9edb-d722-4ce8-8e48-afa7824075a8)
+
 
 
 
@@ -25,7 +26,13 @@
 <details>
   <summary>📂 Version History</summary>
 
-  ### [Version-2.0.0 [23.10.31] [latest]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/48)
+  ### [Version-3.0.0 [23.11.5] [latest]]()
+  - Database Replication: 읽기 전용 복제본 생성
+  - ProxySQL을 통한 쿼리 분산
+  - 읽기 쿼리는 Master/Slave 분산
+  - 쓰기 쿼리는 Master로 라우팅
+
+  ### [Version-2.0.0 [23.10.31]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/48)
   - 도커 컴포즈를 이용한 CI/CD 구축
   - Auto Scaling Group 생성
   - Target Tracking Policy 에 따른 Scale Out & Scale In (criteria: CPU 90%)
@@ -69,6 +76,7 @@
   - [단위 테스트 작성 & 테스트 환경 최적화](#단위-테스트-작성--테스트-환경-최적화)
   - [AWS Pipeline & Nginx를 활용한 무중단 배포](#aws-pipeline--nginx를-활용한-무중단-배포)
   - [도커 컴포즈와 오토 스케일링 도입](#도커-컴포즈와-오토-스케일링-도입)
+  - [Database Replication & ProxySQL 쿼리 분산](#database-replication--proxysql-쿼리-분산)
   - [OAuth2 & JWT 기반 로그인 기능](#oauth2--jwt-기반-로그인-기능)
   - [N+1 문제 해결](#n1-문제-해결)
   - [낙관적 락을 이용한 좋아요 기능 동시성 제어](#낙관적-락을-이용한-좋아요-기능-동시성-제어)
@@ -220,10 +228,26 @@
 - 아래 이미지는 오토 스케일링에 의해 Scale Out 되는 과정을 나타낸 시퀀스 다이어그램입니다.
 ![autoscaling](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/d43faf42-e248-4169-a131-c66a84ebb08f)
 - 아래 이미지는 `/board/list` 게시글 목록 조회 API에 대해 Scale Out 전후의 성능을 비교한 것으로, 한 대의 서버일 때보다 두 대의 서버일 때 성능이 올라간 것을 확인한 결과입니다.
-<img width="1424" alt="scaleoutperformance" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/c7942c20-b4bd-47c5-bb82-bacf989c32aa">
+  <img width="1424" alt="scaleoutperformance" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/c7942c20-b4bd-47c5-bb82-bacf989c32aa">
 
+<br/>
 
-  
+## Database Replication & ProxySQL 쿼리 분산
+- 트래픽이 증가함에 따라 오토 스케일링으로 애플리케이션 서버의 확장을 구축했지만, 데이터베이스는 여전히 과부하로 인한 병목지점이 될 수 있을 것이라 생각했습니다. 이는 EC2 인스턴스가 아무리 늘어난다 하더라도, DB 병목으로 서비스 전체 성능에 악영향이 될 것입니다.
+- 우선, DB의 부하를 나누고자 AWS RDS의 읽기 복제본 생성을 통해 Replica를 쉽게 생성할 수 있었습니다. 해당 복제본은 기본적으로 `Asynchronous Replication`을 통해 데이터의 무결성을 제공합니다.
+- 처음에는 애플리케이션 레벨에서 DataSource를 두 개로 나누어 읽기는 Slave(=Replica), 쓰기는 Master(=Source)로 보내도록 구현하려 했습니다.
+- 하지만 해당 방식은 읽기 쿼리를 RR 방식으로 분산시키는 로직을 직접 구현해야 했으며, 이는 애플리케이션 코드가 상당히 데이터베이스에 의존적으로 변하게 되어 유연성이 떨어질 것이라 생각했습니다.
+- 또한, Master가 다운되게 된다면 가용성이 떨어져 대처가 어렵다는 단점이 있었습니다.
+- 이러한 단점들과 확장성 및 유연성을 고려하여 ProxySQL이라는 프록시 서버를 도입해서 쿼리의 타입(읽기, 쓰기)별로 쿼리를 분산 처리하기로 결정했습니다.
+- ProxySQL의 설정과 datasource의 URL만 수정해주면 ProxySQL을 통해 읽기 쿼리가 RR 방식으로 Master와 Slave에 분산 처리되고, 쓰기 쿼리는 Master에서만 처리됩니다.
+- 또한 ProxySQL은 Master DB의 장애가 생겨 쿼리를 처리할 수 없게 되는 경우, 자동으로 `Failover`를 수행하여 Slave 호스트 그룹 중 하나를 자동으로 Master DB로 승격하는 기능을 지원합니다.
+- 결과적으로 이 작업을 통해서 데이터베이스의 부하를 분산할 수 있었고, 서비스 전체의 고가용성을 좀 더 보장할 수 있게 되었습니다.
+- 아래 이미지는 애플리케이션에 임의의 부하를 가했을 때, Master/Slave DB 커넥션 개수를 비교한 그래프입니다. 커넥션의 개수가 분산됨 확인할 수 있었고 데이터베이스의 부하로 인한 병목을 줄일 수 있을 것으로 기대할 수 있었습니다.
+  <img width="1511" alt="스크린샷 2023-11-05 오전 10 58 24" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/349395fe-1368-48e3-9c0c-f98faa95b05f">
+
+- 하지만 한계점으로는 ProxySQL을 거쳐서 DB로 가기 때문에 이로 인한 네트워크 지연을 고려해야 했습니다.
+- 한계점을 극복하고자 Connection Pool을 고려하여 적절한 커넥션 풀 개수를 조정해주면 성능에 좀 더 좋은 영향을 줄 수 있을 것이라 생각합니다.
+- Spring Boot와 ProxySQL 간의 커넥션 풀, 그리고 ProxySQL과 Database 간의 커넥션 풀을 모두 고려하여, 앞으로 최적의 커넥션 풀을 찾는 작업을 할 계획입니다.
 
 
 <br/>
