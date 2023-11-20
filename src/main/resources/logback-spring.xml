@@ -1,0 +1,13 @@
+<configuration>
+    <springProfile name="local">
+        <include resource="logback-local.xml"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <include resource="logback-prod.xml"/>
+    </springProfile>
+
+    <springProfile name="test">
+        <include resource="logback-test.xml"/>
+    </springProfile>
+</configuration>
