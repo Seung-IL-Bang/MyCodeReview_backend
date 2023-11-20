@@ -109,9 +109,8 @@ dependencies {
 	// Kafka
 	implementation 'org.apache.kafka:kafka_2.13:3.6.0'
 
-	// Logback Kafka Appender
-	implementation 'com.github.danielwegener:logback-kafka-appender:0.2.0-RC2'
-
+	// Logback
+	implementation 'com.github.danielwegener:logback-kafka-appender:0.1.0'
 
 }
 
