@@ -1,0 +1,28 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date - %-5p %t %-25logger{5} %F:%L %m%n</pattern>
+        </encoder>
+    </appender>
+    <!--KafkaAppender-->
+    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="com.github.danielwegener.logback.kafka.encoding.LayoutKafkaMessageEncoder">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </layout>
+        </encoder>
+        <topic>log-topic</topic> <!-- Kafka 토픽 이름 -->
+<!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />-->
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+        <producerConfig>bootstrap.servers=localhost:9092</producerConfig> <!-- Kafka 서버 주소 -->
+    </appender>
+
+    <logger name="kafka-logger" level="INFO" additivity="false">
+        <appender-ref ref="kafkaAppender"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
