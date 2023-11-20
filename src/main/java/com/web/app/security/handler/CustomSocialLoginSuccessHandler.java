@@ -6,7 +6,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -16,7 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.util.Map;
 
-@Log4j2
+@Slf4j(topic = "kafka-logger")
 @RequiredArgsConstructor
 public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -36,8 +38,6 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.info("========================== Social Login Success Handler ==========================");
-
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         MemberSecurityDTO principal = (MemberSecurityDTO) authentication.getPrincipal();
@@ -80,6 +80,10 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
 
 
             getRedirectStrategy().sendRedirect(request, response, uri);
+            log.info(String.format("LOGIN SUCCESS: name=%s, email=%s, role=%s",
+                    principal.getName(),
+                    principal.getEmail(),
+                    principal.getRole()));
         }
     }
 }

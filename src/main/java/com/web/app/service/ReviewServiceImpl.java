@@ -9,6 +9,7 @@ import com.web.app.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j(topic = "kafka-logger")
 @RequiredArgsConstructor
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -53,6 +55,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         review.setBoard(board);
         Review saved = reviewRepository.save(review);
+
+        log.info(String.format("CREATE REVIEW: id=%d, board_id=%d, writer=%s, email=%s",
+                saved.getId(),
+                board.getId(),
+                board.getWriter(),
+                board.getEmail()));
 
         return saved.getId();
     }
@@ -134,16 +142,23 @@ public class ReviewServiceImpl implements ReviewService {
 
         String requestEmail = (String) request.getAttribute("userEmail");
 
-        if (!findOne.getBoard().getEmail().equals(requestEmail) || requestEmail.isBlank()) {
+        Board board = findOne.getBoard();
+
+        if (!board.getEmail().equals(requestEmail) || requestEmail.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
 
         findOne.change(newReview.getSubTitle(), newReview.getContent()); // dirty check ? => not
 
-        reviewRepository.save(findOne);
+        Review modified = reviewRepository.save(findOne);
 
-        return findOne;
+        log.info(String.format("UPDATE REVIEW: id=%d, board_id=%d, writer=%s, email=%s",
+                modified.getId(),
+                board.getId(),
+                board.getWriter(),
+                board.getEmail()));
+        return modified;
     }
 
     @Override
@@ -153,10 +168,17 @@ public class ReviewServiceImpl implements ReviewService {
 
         String requestEmail = (String) request.getAttribute("userEmail");
 
-        if (!review.getBoard().getEmail().equals(requestEmail) || requestEmail.isBlank()) {
+        Board board = review.getBoard();
+
+        if (!board.getEmail().equals(requestEmail) || requestEmail.isBlank()) {
             throw new RuntimeException("해당 요청은 게시글 작성자만 가능합니다.");
         }
 
         reviewRepository.deleteById(id);
+        log.info(String.format("DELETE REVIEW: id=%d, board_id=%d, writer=%s, email=%s",
+                review.getId(),
+                board.getId(),
+                board.getWriter(),
+                board.getEmail()));
     }
 }
