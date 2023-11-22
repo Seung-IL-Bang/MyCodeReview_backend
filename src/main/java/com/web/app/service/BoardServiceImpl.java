@@ -9,6 +9,7 @@ import com.web.app.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+@Slf4j(topic = "kafka-logger")
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -52,7 +54,7 @@ public class BoardServiceImpl implements BoardService {
         }
 
         Board save = boardRepository.save(board);
-
+        log.info(String.format("CREATE BOARD: id=%d, writer=%s, email=%s", save.getId(), save.getWriter(), save.getEmail()));
         return save.getId();
     }
 
@@ -193,7 +195,10 @@ public class BoardServiceImpl implements BoardService {
         }
 
         board.change(newBoard.getTitle(), newBoard.getContent(), newBoard.getTagList(), newBoard.getLink(), newBoard.getDifficulty());
-        return boardRepository.save(board);
+
+        Board modified = boardRepository.save(board);
+        log.info(String.format("UPDATE BOARD: id=%d, writer=%s, email=%s", modified.getId(), modified.getWriter(), modified.getEmail()));
+        return modified;
     }
 
     @Override
@@ -216,6 +221,7 @@ public class BoardServiceImpl implements BoardService {
 
 
         boardRepository.delete(board);
+        log.info(String.format("DELETE BOARD: id=%d, writer=%s, email=%s", board.getId(), board.getWriter(), board.getEmail()));
     }
 
     @Override

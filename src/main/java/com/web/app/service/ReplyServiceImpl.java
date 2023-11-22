@@ -14,11 +14,13 @@ import com.web.app.repository.ReplyRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+@Slf4j(topic = "kafka-logger")
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -45,18 +47,22 @@ public class ReplyServiceImpl implements ReplyService {
         Reply reply = replyRequestDTO.toEntity(null, member, comment);
 
         Reply saved = replyRepository.save(reply);
-
+        log.info(String.format("CREATE REPLY: id=%d, comment_id=%d, writer=%s, email=%s",
+                saved.getId(),
+                comment.getId(),
+                member.getName(),
+                member.getEmail()));
         return new ReplyResponseDTO(saved);
     }
 
     @Override
     public void update(ReplyRequestDTO replyRequestDTO, HttpServletRequest request) throws BusinessLogicException {
 
-        memberRepository.findById(replyRequestDTO.getMemberEmail()).orElseThrow(() -> {
+        Member member = memberRepository.findById(replyRequestDTO.getMemberEmail()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
         });
 
-        commentRepository.findById(replyRequestDTO.getCommentId()).orElseThrow(() -> {
+        Comment comment = commentRepository.findById(replyRequestDTO.getCommentId()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 댓글은 존재하지 않습니다.");
         });
 
@@ -74,6 +80,11 @@ public class ReplyServiceImpl implements ReplyService {
         reply.modify(replyRequestDTO.getContent());
 
         replyRepository.save(reply);
+        log.info(String.format("UPDATE REPLY: id=%d, comment_id=%d, writer=%s, email=%s",
+                reply.getId(),
+                comment.getId(),
+                member.getName(),
+                member.getEmail()));
     }
 
     @Override
@@ -85,10 +96,16 @@ public class ReplyServiceImpl implements ReplyService {
 
         String requestEmail = (String) request.getAttribute("userEmail");
 
-        if (!Objects.equals(reply.getMember().getEmail(), requestEmail)) {
+        Member member = reply.getMember();
+
+        if (!Objects.equals(member.getEmail(), requestEmail)) {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
         }
 
         replyRepository.delete(reply);
+        log.info(String.format("DELETE REPLY: id=%d, writer=%s, email=%s",
+                reply.getId(),
+                member.getName(),
+                member.getEmail()));
     }
 }
