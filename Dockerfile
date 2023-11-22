@@ -20,4 +20,5 @@ CMD java \
 -Dcom.sun.management.jmxremote.password.file=/home/ubuntu/app/config/jmxremote.password \
 -Dcom.sun.management.jmxremote.ssl=false \
 -Djava.rmi.server.hostname=$JAVA_RMI_SERVER_HOSTNAME \
+-Dlogback.configurationFile=/home/ubuntu/app/config/logback-spring.xml \
 -jar app.jar
