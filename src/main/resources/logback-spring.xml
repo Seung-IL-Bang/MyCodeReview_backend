@@ -17,6 +17,9 @@
             <topic>${kafka.topic}</topic> <!-- Kafka 토픽 이름 -->
             <!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />-->
             <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+            <producerConfig>max.block.ms=1000</producerConfig>
+            <producerConfig>reconnect.backoff.max.ms=30000</producerConfig>
+            <producerConfig>retries=1</producerConfig>
             <producerConfig>bootstrap.servers=${kafka.bootstrap.servers}</producerConfig> <!-- Kafka 서버 주소 -->
         </appender>
         <!--KafkaLogger-->
@@ -51,6 +54,9 @@
             <topic>${kafka.topic}</topic> <!-- Kafka 토픽 이름 -->
             <!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />-->
             <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+            <producerConfig>max.block.ms=1000</producerConfig>
+            <producerConfig>reconnect.backoff.max.ms=30000</producerConfig>
+            <producerConfig>retries=1</producerConfig>
             <producerConfig>bootstrap.servers=${kafka.bootstrap.servers}</producerConfig> <!-- Kafka 서버 주소 -->
         </appender>
         <!--KafkaLogger-->
