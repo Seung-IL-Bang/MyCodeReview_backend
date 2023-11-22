@@ -8,7 +8,6 @@ public class MyCodeReviewApplication {
 
 	public static final String APPLICATION_LOCATIONS = "spring.config.location="
 			+ "classpath:application.yml,"
-			+ "classpath:logback-spring.xml,"
 			+ "file:/home/ubuntu/app/config/application-prod.yml,"
 			+ "file:/home/ubuntu/app/config/application-prodoauth.yml";
 
