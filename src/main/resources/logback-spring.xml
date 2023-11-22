@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE configuration>
 <configuration>
     <springProfile name="prod">
         <springProperty name="kafka.topic" source="KAFKA_TOPIC"/>
@@ -87,5 +85,4 @@
             <appender-ref ref="Console"/>
         </root>
     </springProfile>
-
 </configuration>
