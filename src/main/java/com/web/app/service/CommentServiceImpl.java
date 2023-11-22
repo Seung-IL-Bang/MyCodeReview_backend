@@ -13,12 +13,14 @@ import com.web.app.repository.MemberRepository;
 import com.web.app.repository.ReplyRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+@Slf4j(topic = "kafka-logger")
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -47,17 +49,22 @@ public class CommentServiceImpl implements CommentService {
 
         Comment save = commentRepository.save(comment);
 
+        log.info(String.format("CREATE COMMENT: id=%d, board_id=%d, writer=%s, email=%s",
+                save.getId(),
+                board.getId(),
+                member.getName(),
+                member.getEmail()));
         return new CommentResponseDTO(save);
     }
 
     @Override
     public void update(CommentRequestDTO commentRequestDTO, HttpServletRequest request) throws BusinessLogicException {
 
-        memberRepository.findById(commentRequestDTO.getMemberEmail()).orElseThrow(() -> {
+        Member member = memberRepository.findById(commentRequestDTO.getMemberEmail()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 회원은 존재하지 않습니다.");
         });
 
-        boardRepository.findById(commentRequestDTO.getBoardId()).orElseThrow(() -> {
+        Board board = boardRepository.findById(commentRequestDTO.getBoardId()).orElseThrow(() -> {
             throw new NoSuchElementException("해당 게시글은 존재하지 않습니다.");
         });
 
@@ -73,7 +80,12 @@ public class CommentServiceImpl implements CommentService {
 
         comment.modify(commentRequestDTO.getContent());
 
-        commentRepository.save(comment); // dirty check possible?
+        commentRepository.save(comment);// dirty check possible?
+        log.info(String.format("UPDATE COMMENT: id=%d, board_id=%d, writer=%s, email=%s",
+                comment.getId(),
+                board.getId(),
+                member.getName(),
+                member.getEmail()));
     }
 
     @Override
@@ -85,12 +97,17 @@ public class CommentServiceImpl implements CommentService {
 
         String requestEmail = (String) request.getAttribute("userEmail");
 
+        Member member = comment.getMember();
 
-        if (!Objects.equals(comment.getMember().getEmail(), requestEmail)) {
+        if (!Objects.equals(member.getEmail(), requestEmail)) {
             throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED);
         }
 
         replyRepository.deleteRepliesByCommentIs(comment);
         commentRepository.delete(comment);
+        log.info(String.format("DELETE COMMENT: id=%d, writer=%s, email=%s",
+                comment.getId(),
+                member.getName(),
+                member.getEmail()));
     }
 }

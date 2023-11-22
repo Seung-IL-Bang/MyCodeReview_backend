@@ -15,9 +15,9 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
 
         Info info = new Info()
-                .version("v3.0.0")
+                .version("v4.0.0")
                 .title("My Code Review API Specification")
-                .description("Latest 23.10.15");
+                .description("Latest 23.11.22");
 
         // Security Schema
         String jwtSchemesName = "Authorization";
