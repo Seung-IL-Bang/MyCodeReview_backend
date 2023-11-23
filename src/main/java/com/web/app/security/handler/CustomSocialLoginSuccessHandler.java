@@ -78,12 +78,11 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
                     .toUri()
                     .toString();
 
-
-            getRedirectStrategy().sendRedirect(request, response, uri);
             log.info(String.format("LOGIN SUCCESS: name=%s, email=%s, role=%s",
                     principal.getName(),
                     principal.getEmail(),
                     principal.getRole()));
+            getRedirectStrategy().sendRedirect(request, response, uri);
         }
     }
 }
