@@ -11,7 +11,8 @@
     
 
 ## Architecture
-![v3 0 0](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/c71d9edb-d722-4ce8-8e48-afa7824075a8)
+![v4 0 0My Review](https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/04dcf008-8315-4384-87c2-81057f7ed483)
+
 
 
 
@@ -26,7 +27,12 @@
 <details>
   <summary>📂 Version History</summary>
 
-  ### [Version-3.0.0 [23.11.5] [latest]]()
+  ### [Version-4.0.0 [23.11.22] [latest]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/69)
+  - Logback을 이용한 KafkaAppender 구현
+  - 실시간 로그 모니터링 시스템 구축을 위한 Kafka + ELK 스택 도입
+  - 쓰기 작업 및 로그인 API에 대한 이벤트 로그 전송
+
+  ### [Version-3.0.0 [23.11.5]](https://github.com/Seung-IL-Bang/MyCodeReview_backend/pull/67)
   - Database Replication: 읽기 전용 복제본 생성
   - ProxySQL을 통한 쿼리 분산
   - 읽기 쿼리는 Master/Slave 분산
@@ -77,6 +83,7 @@
   - [AWS Pipeline & Nginx를 활용한 무중단 배포](#aws-pipeline--nginx를-활용한-무중단-배포)
   - [도커 컴포즈와 오토 스케일링 도입](#도커-컴포즈와-오토-스케일링-도입)
   - [Database Replication & ProxySQL 쿼리 분산](#database-replication--proxysql-쿼리-분산)
+  - [Kafka & ELK 스택을 이용한 로그 모니터링 시스템 구축](#kafka--elk-스택을-이용한-로그-모니터링-시스템-구축)
   - [OAuth2 & JWT 기반 로그인 기능](#oauth2--jwt-기반-로그인-기능)
   - [N+1 문제 해결](#n1-문제-해결)
   - [낙관적 락을 이용한 좋아요 기능 동시성 제어](#낙관적-락을-이용한-좋아요-기능-동시성-제어)
@@ -248,6 +255,33 @@
 - 하지만 한계점으로는 ProxySQL을 거쳐서 DB로 가기 때문에 이로 인한 네트워크 지연을 고려해야 했습니다.
 - 한계점을 극복하고자 Connection Pool을 고려하여 적절한 커넥션 풀 개수를 조정해주면 커넥션을 열고 닫는데 드는 비용을 줄일 수 있고, 성능에 좀 더 좋은 영향을 줄 수 있을 것이라 생각했습니다.
 - Spring Boot와 ProxySQL 간의 커넥션 풀, 그리고 ProxySQL과 Database 간의 커넥션 풀을 모두 고려하여, 앞으로 최적의 커넥션 풀을 찾는 작업을 할 계획입니다.
+
+<br/>
+
+## Kafka & ELK 스택을 이용한 로그 모니터링 시스템 구축
+
+1. 로그 모니터링 부재로 인한 문제점과 불편한 점
+- 이벤트가 발생할 때마다 그에 대한 실시간 감지가 불가능하여, 문제가 발생하면 신속하게 파악하고 해결하기 어려웠습니다.
+- 컨테이너에서 실행되는 애플리케이션들의 로그 데이터를 효과적으로 수집하고 관리하기 어려웠으며, 로그 데이터의 중앙 집계 및 검색이 불가능한 환경이었습니다.
+
+2. 로그 모니터링 시스템 구축
+- 앞서 언급한 문제를 해결하고 향후 유사한 문제를 미리 예방하기 위해 로그 모니터링 시스템을 구축하기로 결정하였습니다.
+- Spring Boot 애플리케이션에서 쓰기(Write) 작업에 대한 이벤트 로그를 생성하여 Kafka 브로커에 전송하고, Logstash에서 Consume하여 Elasticsearch에 저장합니다. 최종적으로 Kibana에서 로그를 모니터링 할 수 있도록 했습니다.
+
+3. 기술 스택 선정
+- 로그 모니터링 구축을 위해 Kafka와 ELK 스택을 아래와 같은 이유로 선택했습니다.
+  - Kafka: 대규모 데이터 스트리밍 처리와 이벤트 기반 로그 모니터링에 적합하며, 실시간 이벤트 감지와 고급 데이터 스트리밍을 제공합니다.
+  - ELK 스택: 중앙 집계, 강력한 검색 및 시각화 능력을 통해 로그 데이터 관리 및 분석에 용이합니다.
+  - 이러한 조합은 대용량 데이터 처리, 중앙 집계, 강력한 검색 및 시각화를 통합하여 제공하며, 확장성과 커뮤니티 지원 측면에서도 강점을 가지고 있었습니다.
+
+4. 결과
+- 실시간 로그 데이터 수집, 중앙 집계, 검색 및 시각화를 통해 시스템 모니터링을 향상시키고, 대응 시간을 단축하며, 문제를 빠르게 파악할 수 있게 되었습니다.
+- Kafka와 ELK 스택을 구축하고 운영하면서 이러한 기술에 대한 이해도를 크게 향상시키는 경험이었습니다.
+
+아래 이미지는 Spring Boot에서 발생한 이벤트 로그를 Kafka -> Logstash -> Elasticsearch 을 거쳐서 최종적으로 Kibana 대시보드에서 확인한 결과입니다.
+<img width="1375" alt="스크린샷 2023-11-24 오후 4 08 43" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/8859a402-328a-4195-a37a-453ba37d19f7">
+
+
 
 
 <br/>
