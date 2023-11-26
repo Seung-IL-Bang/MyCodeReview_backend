@@ -28,7 +28,7 @@ public class BoardListResponseDTO {
                 .id(board.getId())
                 .title(board.getTitle())
                 .tagList(tags)
-                .difficulty(board.getLink())
+                .difficulty(board.getDifficulty())
                 .writer(board.getWriter())
                 .email(board.getEmail())
                 .likeCount(board.getLikeCount())
