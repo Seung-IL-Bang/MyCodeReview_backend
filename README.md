@@ -337,6 +337,7 @@ Scale Out 되는 새로운 인스턴스는 시작 템플릿에 정의된 User Da
 
 
 **3. 성능 테스트 결과**
+
 아래 이미지는 `/board/list` 게시글 목록 조회 API에 대해 Scale Out 전후의 성능을 비교한 것으로, 한 대의 서버일 때보다 두 대의 서버일 때 성능이 올라간 것을 확인한 결과입니다.
 
 <img width="1424" alt="scaleoutperformance" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/c7942c20-b4bd-47c5-bb82-bacf989c32aa">
