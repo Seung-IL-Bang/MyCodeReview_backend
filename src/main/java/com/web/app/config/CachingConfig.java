@@ -66,8 +66,8 @@ public class CachingConfig {
     public LettucePoolingClientConfiguration lettucePoolConfig(ClientResources clientResources) {
         GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
         poolConfig.setMaxTotal(5);
-        poolConfig.setMaxIdle(3);
-        poolConfig.setMinIdle(1);
+        poolConfig.setMaxIdle(5);
+        poolConfig.setMinIdle(5);
         return LettucePoolingClientConfiguration.builder()
                 .poolConfig(poolConfig)
                 .clientResources(clientResources)
