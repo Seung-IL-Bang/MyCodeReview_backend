@@ -187,6 +187,11 @@
 
 <img width="2030" alt="index" src="https://github.com/Seung-IL-Bang/MyCodeReview_backend/assets/87510898/e879d160-214c-41e8-ab5f-0ba886e2acfd">
 
+**3. 결과**
+  1. `email` 필드를 이용한 조회가 가장 많이 이뤄지므로 해당 필드에 인덱스를 생성해주어 성능을 개선할 수 있었습니다.
+  2. `Using filesort`라는 것은 MySQL이 디스크 기반의 정렬 알고리즘(filesort)을 사용한다는 뜻입니다. `Using filesort`는 때로는 부하가 될 수 있습니다. 따라서 `EXPLAIN` 결과를 참고하여 `Using filesort` 쿼리에 대해 `ORDER BY` 성능을 향상시키기 위해 `created_at` 필드에 인덱스를 생성해주었습니다.
+  3. 난이도에 따른 동적 쿼리시 `difficulty` 필드에 인덱스를 생성해주어 성능을 개선할 수 있었습니다.
+
 <br/>
 
 ## DB 부하를 줄이기 위한 캐싱
