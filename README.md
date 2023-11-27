@@ -3,6 +3,8 @@
 ## Introduction
 📎 배포 링크: https://my-code-review-frontend.vercel.app/
 
+📎 프론트엔드 프로젝트: https://github.com/Seung-IL-Bang/MyCodeReview_frontend
+
 ⏳ 개발 기간: 2023.04 ~ 진행 중
 
 👨🏻‍💻 프로젝트 소개
