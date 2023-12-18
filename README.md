@@ -445,9 +445,9 @@ Scale Out 되는 새로운 인스턴스는 시작 템플릿에 정의된 User Da
 - 결과적으로 `@Batchsize`를 통한 완전한 해결은 불가능했지만 어느 정도 완화시킬 수는 있었습니다.
 
 **3. 두 번째 해결 시도 @EntityGroup**
-- 다른 해결 방법으로는 `@EntityGroup`과 `Fetch Join` 등이 있었습니다.
-- 둘 다 효과적으로 N+1 문제를 해결 할 수 있지만, 사용성이 더 편한 `@EntityGroup` 방법을 사용하기로 결정했습니다.
-- `@EntityGroup` 사용으로 필요한 연관 엔티티만 Eager Loading 방식으로 로드할 수 있었고 덕분에 N+1 문제도 해결할 수 있었습니다.
+- 다른 해결 방법으로는 `@EntityGraph`과 `Fetch Join` 등이 있었습니다.
+- 둘 다 효과적으로 N+1 문제를 해결 할 수 있지만, 사용성이 더 편한 `@EntityGraph` 방법을 사용하기로 결정했습니다.
+- `@EntityGraph` 사용으로 필요한 연관 엔티티만 Eager Loading 방식으로 로드할 수 있었고 덕분에 N+1 문제도 해결할 수 있었습니다.
 
 <br/>
 
