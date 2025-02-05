@@ -1,7 +1,7 @@
 # MyCodeReview_backend
 
 ## Introduction
-📎 배포 링크: https://my-code-review-frontend.vercel.app/
+📎 배포 링크(중단): https://my-code-review-frontend.vercel.app/
 
 📎 프론트엔드 프로젝트: https://github.com/Seung-IL-Bang/MyCodeReview_frontend
 
